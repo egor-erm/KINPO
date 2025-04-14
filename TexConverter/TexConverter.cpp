@@ -8,7 +8,8 @@ using namespace std;
 
 int main()
 {
-    
+    int a = -1;
+    cout << +a;
 }
 
 string readInputFile(string path, Error* error) {

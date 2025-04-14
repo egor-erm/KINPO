@@ -11,11 +11,16 @@ class Error {
 private:
 	ErrorType type;
 	string errorInputFileWay;
-	string errorOutputfileWay;
+	string errorOutputFileWay;
 	string errorValue;
 	int errorIndex;
 
 public:
 	Error(ErrorType type);
 	string generateErrorMessage();
+	void setErrorInputFileWay(string path);
+	void setErrorOutputFileWay(string path);
+	void setErrorValue(string value);
+	void setErrorIndex(int index);
+	bool operator<(const Error& err) const;
 };

@@ -25,6 +25,8 @@ public:
 
 	bool isOperand() const;
 	bool isOperator() const;
+	bool isLogicalOrCompareOperator() const;
+	bool isLogOrTrigonometricFunction() const;
 
 	NodeType getType() const;
 	void setType(NodeType type);
