@@ -1,4 +1,8 @@
 ﻿  Error.cpp
+  Node.cpp
   TexConverter.cpp
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(236,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(261,34): warning C4129: .: неизвестная escape-последовательность
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(348,13): warning C4834: удаление возвращаемого значения функции с атрибутом [[nodiscard]]
   Создание кода...
   TexConverter.vcxproj -> D:\university\kinpo\KINPO\x64\Debug\TexConverter.exe
