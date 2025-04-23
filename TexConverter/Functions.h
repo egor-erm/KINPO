@@ -18,10 +18,8 @@ void prepareExtensionParseTree(Node* startNode);
 
 void formatMultiplicationOrder(Node* startNode);
 
-string convertNodeToTex(Node* node, Node* degreeNode);
+string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand);
 
 bool compareNodes(const Node* leftNode, const Node* rightNode);
-
-bool isNeedToPutFuncArgsInParentheses(Node* node);
 
 string putInParenthesesIfNeeded(string str, bool putInParentheses);
