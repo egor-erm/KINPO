@@ -29,13 +29,14 @@ public:
 	bool isOperand() const;
 	bool isOperator() const;
 	bool isLogOrTrigonometricFunction() const;
+	bool isSeparatingOperator() const;
 	bool isNeedParentheses(Node* parent, const bool& parentIsFirst);
 
 	NodeType getType() const;
 	void setType(NodeType type);
 
-	int getMultiplierTypePriority() const;
 	int getPrecedence() const;
+	int getMultiplierPrecedence() const;
 	string getTexFormatedValue() const;
 
 	vector<Node*>& getOperands();

@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#define FMT_HEADER_ONLY
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -26,7 +27,6 @@ int main(int argc, char* argv[])
         cout << err->generateErrorMessage();
         return 1;
     }
-    cout << "ok4";
 
     set<Error> errors;
     Node* node = parseExtensionParseTreeToNodeTree(tree, errors);
@@ -37,26 +37,19 @@ int main(int argc, char* argv[])
 
         return 1;
     }
-    cout << "ok3";
 
     prepareExtensionParseTree(node);
     formatMultiplicationOrder(node);
 
-    cout << "ok5";
-
     string tex = convertNodeToTex(node, NULL, true);
-    cout << "ok6";
+    tex = "\\documentclass{article}\n\\begin{document}\n$ " + tex + " $\n\\end{document}";
 
-    //tex = "\\documentclass{article}\n\\begin{document}\n$ " + tex + " $\n\\end{document}";
-    cout << "ok2";
-    /*err = writeOutputFile(argv[2], tex);
+    err = writeOutputFile(argv[2], tex);
     if (err != NULL) {
-        cout << "nok2";
         cout << err->generateErrorMessage();
         return 1;
-    }*/
+    }
 
-    cout << "ok1" << endl << tex;
     return 0;
 }
 
@@ -95,9 +88,8 @@ string readInputFile(string path, Error* error) {
 }
 
 Error* writeOutputFile(string path, string text) {
-    cout << "f0";
     ofstream file(path);
-    cout << "f1";
+
     // Проверяем, удалось ли открыть файл для записи
     if (!file.is_open()) {
         return new Error(ErrorType::ImpossibleToCreateOutputFile);
@@ -111,14 +103,12 @@ Error* writeOutputFile(string path, string text) {
         return new Error(ErrorType::ImpossibleToCreateOutputFile);
     }
 
-    cout << "f2";
-
     // Закрываем файл и проверяем, не было ли ошибки
     file.close();
     if (!file) {
         return new Error(ErrorType::ImpossibleToCreateOutputFile);
     }
-    cout << "f3";
+
     // Если всё успешно - возвращаем NULL
     return NULL;
 }
@@ -262,7 +252,7 @@ void formatMultiplicationOrder(Node* startNode) {
 }
 
 bool compareNodes(const Node* leftNode, const Node* rightNode) {
-    return leftNode->getMultiplierTypePriority() < rightNode->getMultiplierTypePriority();
+    return leftNode->getMultiplierPrecedence() < rightNode->getMultiplierPrecedence();
 }
 
 string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand) {
@@ -279,7 +269,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         leftOperator = operands[0];
         leftInParentheses = leftOperator->isNeedParentheses(node, isFirstOperand);
 
-        string tex = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), leftInParentheses);
+        string tex = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || leftInParentheses), leftInParentheses);
         for (int i = 1; i < operands.size(); i++) {
             rightOperator = operands[i];
             rightInParentheses = rightOperator->isNeedParentheses(node, isFirstOperand);
@@ -290,7 +280,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
 
             if (!omitBullet) tex += Node::operatorTypeToTexValue.at(node->getType());
 
-            tex += putInParenthesesIfNeeded(convertNodeToTex(rightOperator, NULL, false), rightInParentheses);
+            tex += putInParenthesesIfNeeded(convertNodeToTex(rightOperator, NULL, right), rightInParentheses);
 
             leftInParentheses = rightInParentheses;
             leftOperator = rightOperator;
@@ -305,7 +295,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
                 tex = convertNodeToTex(operands[0], operands[1]->getOperands().at(0), true) + "}";
             }
             else {
-                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isOperator());
+                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isNeedParentheses(node, isFirstOperand));
                 string degree = convertNodeToTex(operands[1]->getOperands().at(0), NULL, true);
                
                 tex = fmt::vformat(
@@ -325,9 +315,9 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
                 return convertNodeToTex(operands[0], operands[1], true);
             }
             else {
-                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isOperator());
+                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isNeedParentheses(node, isFirstOperand));
                 string degree = convertNodeToTex(operands[1], NULL, true);
-
+                
                 return fmt::vformat(
                     Node::operatorTypeToTexValue.at(node->getType()),
                     fmt::make_format_args(operand, degree)
@@ -362,34 +352,14 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
     }
     else if (node->getType() == NodeType::Ternary) {
         string condition = convertNodeToTex(operands[0], NULL, true);
-        string operand1 = convertNodeToTex(operands[1], NULL, true);
-        string operand2 = convertNodeToTex(operands[2], NULL, true);
-
-        return fmt::vformat(
-            Node::operatorTypeToTexValue.at(node->getType()),
-            fmt::make_format_args(operand1, condition, operand2, condition)
-        );
+        return "\\begin{cases}" + convertNodeToTex(operands[1], NULL, true) + ", " + condition + " = true\\\\"
+            + convertNodeToTex(operands[2], NULL, true) + ", " + condition + " = false\\end{cases}";
     }
     else if (operands.size() == 2) {
-        cout << "oda";
         bool firstOpearandInParentheses = operands[0]->isNeedParentheses(node, isFirstOperand);
         bool secondOpearandInParentheses = operands[1]->isNeedParentheses(node, isFirstOperand);
-        string operand1 = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || node->getType() == NodeType::Divide || firstOpearandInParentheses), firstOpearandInParentheses);
-        string operand2 = putInParenthesesIfNeeded(convertNodeToTex(operands[1], NULL, node->getType() == NodeType::Divide || secondOpearandInParentheses), secondOpearandInParentheses);
-       
-        try {
-            auto result = fmt::vformat(
-                Node::operatorTypeToTexValue.at(node->getType()),
-                fmt::make_format_args(operand1, operand2)
-            );
-        }
-        catch (const fmt::format_error& e) {
-            cerr << "Ошибка формата: " << e.what() << endl;
-            return "";  // Или другое значение по умолчанию
-        }
-        catch (const exception& e) {
-            cout << "Ошибка форматирования: " << e.what() << endl;
-        }
+        string operand1 = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || node->isSeparatingOperator() || firstOpearandInParentheses), firstOpearandInParentheses);
+        string operand2 = putInParenthesesIfNeeded(convertNodeToTex(operands[1], NULL, node->isSeparatingOperator() || secondOpearandInParentheses), secondOpearandInParentheses);
 
         return fmt::vformat(
             Node::operatorTypeToTexValue.at(node->getType()),
@@ -397,7 +367,8 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         );
     }
     else {
-        string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand), operands[0]->isNeedParentheses(node, isFirstOperand));
+        bool opearandInParentheses = operands[0]->isNeedParentheses(node, isFirstOperand);
+        string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || node->isSeparatingOperator() || opearandInParentheses), opearandInParentheses);
         return fmt::vformat(
             Node::operatorTypeToTexValue.at(node->getType()),
             fmt::make_format_args(operand)

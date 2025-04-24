@@ -32,6 +32,19 @@ bool Node::isLogOrTrigonometricFunction() const {
         || this->type == NodeType::ArcTan;
 }
 
+bool Node::isSeparatingOperator() const {
+    return this->getType() == NodeType::Assign
+        || this->getType() == NodeType::Divide
+        || this->getType() == NodeType::Ceil
+        || this->getType() == NodeType::Floor
+        || this->getType() == NodeType::TypeCast
+        || this->getType() == NodeType::Round
+        || this->getType() == NodeType::Abs
+        || this->getType() == NodeType::Exp
+        || this->getType() == NodeType::LogicalNot
+        || this->getType() == NodeType::Sqrt;
+}
+
 NodeType Node::getType() const {
     return this->type;
 }
@@ -48,7 +61,7 @@ vector<Node*>& Node::getOperands() {
     return this->operands;
 }
 
-int Node::getMultiplierTypePriority() const {
+int Node::getMultiplierPrecedence() const {
     switch (type) {
     case NodeType::Integer:
         return 0;
@@ -105,27 +118,7 @@ string Node::getTexFormatedValue() const {
 }
 
 bool Node::isNeedParentheses(Node* parent, const bool& parentIsFirst) {
-    if (this->isOperand()) return false;
-
-    if (this->getType() == NodeType::Assign) return true;
-
-    if (parent->getType() == NodeType::Assign 
-        || parent->getType() == NodeType::Divide
-        || parent->getType() == NodeType::Ceil
-        || parent->getType() == NodeType::Floor
-        || parent->getType() == NodeType::TypeCast
-        || parent->getType() == NodeType::Round
-        || parent->getType() == NodeType::Abs
-        || parent->getType() == NodeType::Exp
-        || parent->getType() == NodeType::LogicalNot
-        || parent->getType() == NodeType::Sqrt) return false;
-
-    if (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus) {
-        if (this->getOperands().size() >= 2 && this->getType() != NodeType::Divide && this->getType() != NodeType::Pow
-            || this->getType() == NodeType::UnaryPlus || this->getType() == NodeType::UnaryMinus) return true;
-
-        return false;
-    }
+    if (this->isOperand() || parent == NULL || parent->isSeparatingOperator()) return false;
 
     if (parent->isLogOrTrigonometricFunction()) {
         if (this->getType() == NodeType::Pow && this->getOperands().at(0)->isOperand()) return false;
@@ -139,20 +132,24 @@ bool Node::isNeedParentheses(Node* parent, const bool& parentIsFirst) {
         return true;
     }
 
-    if (this->getType() == NodeType::Ternary && parent->getType() != NodeType::Ternary) return true;
-
     bool isFirst = parent->getOperands().front() == this;    
-    if (this->getType() == NodeType::UnaryMinus || this->getType() == NodeType::UnaryPlus) {
-        if (isFirst && parentIsFirst) return false;
+    if (this->getPrecedence() < parent->getPrecedence()) return true;
+    if (this->getPrecedence() == parent->getPrecedence()) {
+        if ((this->getType() == NodeType::Pow && parent->getType() == NodeType::Pow)
+            || (this->getType() == NodeType::UnaryPlus || this->getType() == NodeType::UnaryMinus) && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
+            ) return true;
+
+        if (isFirst && parentIsFirst 
+            || (parent->getType() == NodeType::Plus && this->getType() == NodeType::Plus)
+            || parent->getType() == NodeType::LogicalAnd 
+            || parent->getType() == NodeType::LogicalOr
+            ) return false;
 
         return true;
     }
 
-    if (this->getPrecedence() < parent->getPrecedence()) return true;
-
-    if (this->getPrecedence() == parent->getPrecedence()) {
+    if (this->getType() == NodeType::UnaryMinus || this->getType() == NodeType::UnaryPlus) {
         if (isFirst && parentIsFirst) return false;
-        if (parent->getType() == NodeType::Plus) return false;
 
         return true;
     }
@@ -162,14 +159,45 @@ bool Node::isNeedParentheses(Node* parent, const bool& parentIsFirst) {
 
 int Node::getPrecedence() const {
     switch (type) {
-    case NodeType::Multiply:
+    case NodeType::LogicalNot:
+        return 17;
+
+    case NodeType::Pow:
+    case NodeType::Abs:
+    case NodeType::Ceil:
+    case NodeType::Floor:
+    case NodeType::Round:
+    case NodeType::Log:
+    case NodeType::Log2:
+    case NodeType::Log10:
+    case NodeType::Sin:
+    case NodeType::Cos:
+    case NodeType::Tan:
+    case NodeType::ArcSin:
+    case NodeType::ArcCos:
+    case NodeType::ArcTan:
+    case NodeType::Indexing:
+    case NodeType::TypeCast:
+        return 16;
+
+    case NodeType::Sqrt:
+    case NodeType::Exp:
+        return 15;
+
     case NodeType::Divide:
+        return 14;
+
+    case NodeType::UnaryPlus:
+    case NodeType::UnaryMinus:
+        return 13;
+
+    case NodeType::Multiply:
     case NodeType::Mod:
-        return 5;
+        return 12;
 
     case NodeType::Plus:
     case NodeType::Minus:
-        return 4;
+        return 11;
 
     case NodeType::GreaterThan:
     case NodeType::LessThan:
@@ -177,13 +205,23 @@ int Node::getPrecedence() const {
     case NodeType::NotEqualTo:
     case NodeType::GreaterOrEqual:
     case NodeType::LessOrEqual:
-        return 3;
+        return 10;
 
     case NodeType::LogicalAnd:
-        return 2;
-
+        return 7;
     case NodeType::LogicalOr:
-        return 1;
+        return 6;
+
+    case NodeType::Ternary:
+        return 4;
+
+    case NodeType::Assign:
+    case NodeType::AddAssign:
+    case NodeType::SubtractAssign:
+    case NodeType::MultiplyAssign:
+    case NodeType::DivideAssign:
+    case NodeType::ModAssign:
+        return 2;
 
     default:
         return 0;
@@ -251,7 +289,7 @@ const map<NodeType, int> Node::operatorTypeToOperandCount = {
         {NodeType::LessOrEqual, 2},
         {NodeType::LogicalAnd, 2},
         {NodeType::LogicalOr, 2},
-        {NodeType::LogicalNot, 2},
+        {NodeType::LogicalNot, 1},
         {NodeType::AddAssign, 2},
         {NodeType::SubtractAssign, 2},
         {NodeType::MultiplyAssign, 2},
@@ -283,7 +321,7 @@ const map<NodeType, const string> Node::operatorTypeToTexValue = {
         {NodeType::Plus, "{} + {}"},
         {NodeType::Minus, "{} - {}"},
         {NodeType::Multiply, " \\bullet "},
-        {NodeType::Divide, "\\frac{{}}{{}}"},
+        {NodeType::Divide, "\\frac{{{}}}{{{}}}"},
         {NodeType::Mod, "{} \\mod {}"},
         {NodeType::UnaryPlus, "+{}"},
         {NodeType::UnaryMinus, "-{}"},
@@ -291,28 +329,27 @@ const map<NodeType, const string> Node::operatorTypeToTexValue = {
         {NodeType::LessThan, "{} < {}"},
         {NodeType::EqualTo, "{} = {}"},
         {NodeType::NotEqualTo, "{} \\neq {}"},
-        {NodeType::GreaterOrEqual, "{} \\geqslant {}"},
-        {NodeType::LessOrEqual, "{} \\leqslant {}"},
+        {NodeType::GreaterOrEqual, "{} \\geq {}"},
+        {NodeType::LessOrEqual, "{} \\leq {}"},
         {NodeType::LogicalAnd, "{} \\wedge {}"},
         {NodeType::LogicalOr, "{} \\vee {}"},
-        {NodeType::Exp, "\\e^{{}}"},
-        {NodeType::LogicalNot, "\\overline{{}}"},
-        {NodeType::Abs, "\\abs{{}}"},
-        {NodeType::Sqrt, "\\sqrt{{}}"},
+        {NodeType::Exp, "\\e^{{{}}}"},
+        {NodeType::LogicalNot, "\\overline{{{}}}"},
+        {NodeType::Abs, "\\abs{{{}}}"},
+        {NodeType::Sqrt, "\\sqrt{{{}}}"},
         {NodeType::Ceil, "\\lceil {} \\rceil"},
         {NodeType::Floor, "\\lfloor {} \\rfloor"},
         {NodeType::TypeCast, "\\lfloor {} \\rfloor"},
         {NodeType::Round, "\\lfloor {} \\rceil"},
-        {NodeType::Pow, "{{}}^{{}}"},
-        {NodeType::Log, "\\ln{{}}{{}}"},
-        {NodeType::Log2, "\\log_{2}{}{{}}"},
-        {NodeType::Log10, "\\lg{}{{}}"},
-        {NodeType::Sin, "\\sin{}{{}}"},
-        {NodeType::Cos, "\\cos{}{{}}"},
-        {NodeType::Tan, "\\tan{}{{}}"},
-        {NodeType::ArcSin, "\\arcsin{}{{}}"},
-        {NodeType::ArcCos, "\\arccos{}{{}}"},
-        {NodeType::ArcTan, "\\arctan{}{{}}"},
-        {NodeType::Indexing, "{}_{{}}"},
-        {NodeType::Ternary, "\\begin{cases}{}, {} = true\\\\{}, {} = false\\end{cases}"}
+        {NodeType::Pow, "{{{}}}^{{{}}}"},
+        {NodeType::Log, "\\ln{{{}}}{{{}}}"},
+        {NodeType::Log2, "\\log_{{2}}{}{{{}}}"},
+        {NodeType::Log10, "\\lg{}{{{}}}"},
+        {NodeType::Sin, "\\sin{}{{{}}}"},
+        {NodeType::Cos, "\\cos{}{{{}}}"},
+        {NodeType::Tan, "\\tan{}{{{}}}"},
+        {NodeType::ArcSin, "\\arcsin{}{{{}}}"},
+        {NodeType::ArcCos, "\\arccos{}{{{}}}"},
+        {NodeType::ArcTan, "\\arctan{}{{{}}}"},
+        {NodeType::Indexing, "{{{}}}_{{{}}}"},
 };
