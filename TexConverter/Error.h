@@ -15,7 +15,7 @@ private:
 	string errorOutputFileWay;
 	string errorValue;
 	int errorIndex;
-
+	
 public:
 	Error(ErrorType type);
 	string generateErrorMessage();

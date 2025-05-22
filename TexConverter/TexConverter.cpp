@@ -118,7 +118,7 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
     istringstream stringStream(extensionParseTree);
 
     string token;
-    int operandsCount, index;
+    int operandsCount, index = 0;
     map<Node*, int> nodesIndex;
     while (stringStream >> token) {
         NodeType type;
@@ -255,7 +255,7 @@ bool compareNodes(const Node* leftNode, const Node* rightNode) {
     return leftNode->getMultiplierPrecedence() < rightNode->getMultiplierPrecedence();
 }
 
-string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand) {
+string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand) {
     if (node->isOperand()) {
         return node->getTexFormatedValue();
     }
@@ -267,12 +267,12 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         Node * leftOperator, * rightOperator;
 
         leftOperator = operands[0];
-        leftInParentheses = leftOperator->isNeedParentheses(node, isFirstOperand);
+        leftInParentheses = leftOperator->needsParentheses(node, isFirstOperand);
 
-        string tex = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || leftInParentheses), leftInParentheses);
+        string tex = putInParenthesesIfNeeded(convertNodeToTex(leftOperator, NULL, isFirstOperand || leftInParentheses), leftInParentheses);
         for (int i = 1; i < operands.size(); i++) {
             rightOperator = operands[i];
-            rightInParentheses = rightOperator->isNeedParentheses(node, isFirstOperand);
+            rightInParentheses = rightOperator->needsParentheses(node, isFirstOperand);
 
             bool omitBullet = ((leftOperator->getType() == NodeType::Integer || leftOperator->getType() == NodeType::Float || leftOperator->getType() == NodeType::Divide)
                 && (rightOperator->getType() == NodeType::Variable || rightOperator->isLogOrTrigonometricFunction()))
@@ -292,10 +292,10 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         if (operands[1]->getType() == NodeType::Divide) {
             string tex;
             if (operands[0]->isLogOrTrigonometricFunction()) {
-                tex = convertNodeToTex(operands[0], operands[1]->getOperands().at(0), true) + "}";
+                tex = convertNodeToTex(operands[0], operands[1]->getOperands().at(0), true);
             }
             else {
-                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isNeedParentheses(node, isFirstOperand));
+                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->needsParentheses(node, isFirstOperand));
                 string degree = convertNodeToTex(operands[1]->getOperands().at(0), NULL, true);
                
                 tex = fmt::vformat(
@@ -315,7 +315,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
                 return convertNodeToTex(operands[0], operands[1], true);
             }
             else {
-                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isNeedParentheses(node, isFirstOperand));
+                string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->needsParentheses(node, isFirstOperand));
                 string degree = convertNodeToTex(operands[1], NULL, true);
                 
                 return fmt::vformat(
@@ -326,7 +326,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         }
     }
     else if (node->isLogOrTrigonometricFunction()) {
-        string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->isNeedParentheses(node, isFirstOperand));
+        string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, true), operands[0]->needsParentheses(node, isFirstOperand));
 
         string degree = "";
         if (degreeNode != NULL && !regex_match(degreeNode->getValue(), one_regex))
@@ -356,8 +356,8 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
             + convertNodeToTex(operands[2], NULL, true) + ", " + condition + " = false\\end{cases}";
     }
     else if (operands.size() == 2) {
-        bool firstOpearandInParentheses = operands[0]->isNeedParentheses(node, isFirstOperand);
-        bool secondOpearandInParentheses = operands[1]->isNeedParentheses(node, isFirstOperand);
+        bool firstOpearandInParentheses = operands[0]->needsParentheses(node, isFirstOperand);
+        bool secondOpearandInParentheses = operands[1]->needsParentheses(node, isFirstOperand);
         string operand1 = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || node->isSeparatingOperator() || firstOpearandInParentheses), firstOpearandInParentheses);
         string operand2 = putInParenthesesIfNeeded(convertNodeToTex(operands[1], NULL, node->isSeparatingOperator() || secondOpearandInParentheses), secondOpearandInParentheses);
 
@@ -367,7 +367,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
         );
     }
     else {
-        bool opearandInParentheses = operands[0]->isNeedParentheses(node, isFirstOperand);
+        bool opearandInParentheses = operands[0]->needsParentheses(node, isFirstOperand);
         string operand = putInParenthesesIfNeeded(convertNodeToTex(operands[0], NULL, isFirstOperand || node->isSeparatingOperator() || opearandInParentheses), opearandInParentheses);
         return fmt::vformat(
             Node::operatorTypeToTexValue.at(node->getType()),
@@ -378,7 +378,7 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool& isFirstOperand
     return "";
 }
 
-string putInParenthesesIfNeeded(string str, bool putInParentheses) {
+string putInParenthesesIfNeeded(string str, const bool putInParentheses) {
     if (putInParentheses) return "(" + str + ")";
 
     return str;

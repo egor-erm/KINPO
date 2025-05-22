@@ -6,10 +6,8 @@
 
 using namespace std;
 
-enum class NodeType {Assign, Plus, Minus, Multiply, Divide, Mod, UnaryPlus, UnaryMinus, GreaterThan, LessThan, EqualTo, NotEqualTo, GreaterOrEqual, LessOrEqual, LogicalAnd, LogicalOr, LogicalNot, AddAssign, SubtractAssign, MultiplyAssign, DivideAssign, ModAssign, Abs, Sqrt, Pow, Ceil, Floor, Round, Exp, Log, Log2, Log10, Sin, Cos, Tan, ArcSin, ArcCos, ArcTan, Indexing, Ternary, TypeCast, Integer, Float, Variable};
-
-enum class OperandPosition {
-	Begin, Middle, End
+enum class NodeType {
+	Assign, Plus, Minus, Multiply, Divide, Mod, UnaryPlus, UnaryMinus, GreaterThan, LessThan, EqualTo, NotEqualTo, GreaterOrEqual, LessOrEqual, LogicalAnd, LogicalOr, LogicalNot, AddAssign, SubtractAssign, MultiplyAssign, DivideAssign, ModAssign, Abs, Sqrt, Pow, Ceil, Floor, Round, Exp, Log, Log2, Log10, Sin, Cos, Tan, ArcSin, ArcCos, ArcTan, Indexing, Ternary, TypeCast, Integer, Float, Variable
 };
 
 class Node {
@@ -30,7 +28,7 @@ public:
 	bool isOperator() const;
 	bool isLogOrTrigonometricFunction() const;
 	bool isSeparatingOperator() const;
-	bool isNeedParentheses(Node* parent, const bool& parentIsFirst);
+	bool needsParentheses(Node* parent, const bool parentIsFirst);
 
 	NodeType getType() const;
 	void setType(NodeType type);

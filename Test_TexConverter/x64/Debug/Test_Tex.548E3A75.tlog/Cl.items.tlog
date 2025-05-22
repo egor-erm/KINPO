@@ -1,0 +1,8 @@
+D:\university\kinpo\KINPO\Test_TexConverter\pch.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\pch.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_compareNodes.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_compareNodes.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_convertNodeToTex.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_convertNodeToTex.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_formatMultiplicationOrder.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_formatMultiplicationOrder.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_getTexFormatedValue.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_getTexFormatedValue.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_needsParentheses.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_needsParentheses.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_parseExtensionParseTreeToNodeTree.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_parseExtensionParseTreeToNodeTree.obj
+D:\university\kinpo\KINPO\Test_TexConverter\Test_prepareExtensionParseTree.cpp;D:\university\kinpo\KINPO\Test_TexConverter\x64\Debug\Test_prepareExtensionParseTree.obj

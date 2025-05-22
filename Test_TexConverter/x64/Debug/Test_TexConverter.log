@@ -1,0 +1,11 @@
+﻿  pch.cpp
+  Test_compareNodes.cpp
+  Test_convertNodeToTex.cpp
+  Test_formatMultiplicationOrder.cpp
+  Test_getTexFormatedValue.cpp
+  Test_needsParentheses.cpp
+  Test_parseExtensionParseTreeToNodeTree.cpp
+  Test_prepareExtensionParseTree.cpp
+  Создание кода...
+     Создается библиотека D:\university\kinpo\KINPO\x64\Debug\Test_TexConverter.lib и объект D:\university\kinpo\KINPO\x64\Debug\Test_TexConverter.exp
+  Test_TexConverter.vcxproj -> D:\university\kinpo\KINPO\x64\Debug\Test_TexConverter.dll

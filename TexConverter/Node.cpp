@@ -87,13 +87,13 @@ string Node::getTexFormatedValue() const {
         // ќпредел€ем систему счислени€
         if (str.size() > 1 && str[0] == '0') {
             if (tolower(str[1]) == 'b' && str.size() > 2) {
-                str = "\\{" + str.substr(2) + "\\}_2";
+                str = "{" + str.substr(2) + "}_2";
             }
             else if (tolower(str[1]) == 'x' && str.size() > 2) {
-                str = "\\{" + str.substr(2) + "\\}_{16}";
+                str = "{" + str.substr(2) + "}_{16}";
             }
             else {
-                str = "\\{" + str.substr(1) + "\\}_8";
+                str = "{" + str.substr(1) + "}_8";
             }
         }
 
@@ -117,7 +117,7 @@ string Node::getTexFormatedValue() const {
     return str;
 }
 
-bool Node::isNeedParentheses(Node* parent, const bool& parentIsFirst) {
+bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
     if (this->isOperand() || parent == NULL || parent->isSeparatingOperator()) return false;
 
     if (parent->isLogOrTrigonometricFunction()) {
@@ -135,7 +135,7 @@ bool Node::isNeedParentheses(Node* parent, const bool& parentIsFirst) {
     bool isFirst = parent->getOperands().front() == this;    
     if (this->getPrecedence() < parent->getPrecedence()) return true;
     if (this->getPrecedence() == parent->getPrecedence()) {
-        if ((this->getType() == NodeType::Pow && parent->getType() == NodeType::Pow)
+        if ((isFirst && this->getType() == NodeType::Pow && parent->getType() == NodeType::Pow) // todo проверка степеней
             || (this->getType() == NodeType::UnaryPlus || this->getType() == NodeType::UnaryMinus) && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
             ) return true;
 
