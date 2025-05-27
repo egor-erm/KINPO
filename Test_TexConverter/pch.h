@@ -23,4 +23,6 @@ bool compareErrors(const set<Error>& expected, const set<Error>& real, set<Error
 
 bool compareTrees(Node* expected, Node* real, const string& path, set<string>& differences);
 
+wstring stringToWstring(const string& s);
+
 #endif //PCH_H

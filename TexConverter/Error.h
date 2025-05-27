@@ -18,7 +18,7 @@ private:
 	
 public:
 	Error(ErrorType type);
-	string generateErrorMessage();
+	string generateErrorMessage() const;
 	void setErrorInputFileWay(string path);
 	void setErrorOutputFileWay(string path);
 	void setErrorValue(string value);

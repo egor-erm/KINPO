@@ -11,7 +11,6 @@
 #include <fmt/args.h>
 
 #include "Functions.h"
-#include "Node.h"
 #include "Error.h"
 
 int main(int argc, char* argv[])
@@ -59,6 +58,7 @@ string readInputFile(string path, Error* error) {
     // Проверяем, удалось ли открыть файл
     if (!file.is_open()) {
         error = new Error(ErrorType::NoAccessToInputFile);
+        error->setErrorInputFileWay(path);
         return "";
     }
 
@@ -69,17 +69,20 @@ string readInputFile(string path, Error* error) {
     // Проверяем, не установлены ли флаги ошибок после чтения
     if (!file) {
         error = new Error(ErrorType::NoAccessToInputFile);
+        error->setErrorInputFileWay(path);
         return "";
     }
 
     string line = buffer.str();
     if (line.empty()) {
         error = new Error(ErrorType::InputFileIsEmpty);
+        error->setErrorInputFileWay(path);
         return "";
     }
 
     if (line.find("\n") != string::npos) {
         error = new Error(ErrorType::MultipleInputLines);
+        error->setErrorInputFileWay(path);
         return "";
     }
 
@@ -92,7 +95,9 @@ Error* writeOutputFile(string path, string text) {
 
     // Проверяем, удалось ли открыть файл для записи
     if (!file.is_open()) {
-        return new Error(ErrorType::ImpossibleToCreateOutputFile);
+        Error *error = new Error(ErrorType::ImpossibleToCreateOutputFile);
+        error->setErrorOutputFileWay(path);
+        return error;
     }
 
     // Пытаемся записать строку в файл
@@ -100,13 +105,17 @@ Error* writeOutputFile(string path, string text) {
 
     // Проверяем, не произошла ли ошибка при записи
     if (!file) {
-        return new Error(ErrorType::ImpossibleToCreateOutputFile);
+        Error* error = new Error(ErrorType::ImpossibleToCreateOutputFile);
+        error->setErrorOutputFileWay(path);
+        return error;
     }
 
     // Закрываем файл и проверяем, не было ли ошибки
     file.close();
     if (!file) {
-        return new Error(ErrorType::ImpossibleToCreateOutputFile);
+        Error* error = new Error(ErrorType::ImpossibleToCreateOutputFile);
+        error->setErrorOutputFileWay(path);
+        return error;
     }
 
     // Если всё успешно - возвращаем NULL
@@ -120,6 +129,7 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
     string token;
     int operandsCount, index = 0;
     map<Node*, int> nodesIndex;
+    map<Node*, string> nodesToken;
     while (stringStream >> token) {
         NodeType type;
         Node* node;
@@ -128,7 +138,10 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
 
             // Проверяем количество операндов в стеке
             if (nodeStack.size() < operandsCount) {
-                errors.insert(Error(ErrorType::MissingOperand));
+                Error error(ErrorType::MissingOperand);
+                error.setErrorIndex(index);
+                error.setErrorValue(token);
+                errors.insert(error);
                 return nullptr;
             }
 
@@ -141,13 +154,20 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
 
             // Создаем новый узел-оператор
             node = new Node(type, operands);
+            nodesIndex[node] = index;
+            nodesToken[node] = token;
         }
         else if (isOperand(token, &type)) {
             // Создаем новый узел-операнд
             node = new Node(type, token);
+            nodesIndex[node] = index;
+            nodesToken[node] = token;
         }
         else {
-            errors.insert(Error(ErrorType::InvalidExpressionParseTreeElement));
+            Error error(ErrorType::InvalidExpressionParseTreeElement);
+                error.setErrorIndex(index);
+                error.setErrorValue(token);
+            errors.insert(error);
             return nullptr;
         }
 
@@ -163,7 +183,17 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
 
     if (nodeStack.size() > 1) {
         nodeStack.pop();
-        errors.insert(Error(ErrorType::ExtraOperand));
+        while (!nodeStack.empty()) {
+            Node* node = nodeStack.top();
+
+            Error error(ErrorType::ExtraOperand);
+            error.setErrorIndex(nodesIndex.at(node));
+            error.setErrorValue(nodesToken.at(node));
+            errors.insert(error);
+
+            nodeStack.pop();
+        }
+        
         return nullptr;
     }
 
@@ -252,7 +282,7 @@ void formatMultiplicationOrder(Node* startNode) {
 }
 
 bool compareNodes(const Node* leftNode, const Node* rightNode) {
-    return leftNode->getMultiplierPrecedence() < rightNode->getMultiplierPrecedence();
+    return leftNode->getMultiplierPrecedence() <= rightNode->getMultiplierPrecedence();
 }
 
 string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand) {

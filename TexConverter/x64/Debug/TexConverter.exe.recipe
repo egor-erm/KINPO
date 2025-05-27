@@ -2,9 +2,6 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\university\kinpo\KINPO\x64\Debug\Test_TexConverter.dll</FullPath>
-    </ProjectOutput>
-    <ProjectOutput>
       <FullPath>D:\university\kinpo\KINPO\x64\Debug\TexConverter.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>

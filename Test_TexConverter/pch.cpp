@@ -28,7 +28,7 @@ bool compareTrees(Node* expected, Node* real, const string& path, set<string>& d
             ss << (real ? "real exists" : "real is null");
             differences.insert(ss.str());
         }
-        return;
+        return differences.empty();
     }
 
     // Проверяем тип узла
@@ -56,9 +56,20 @@ bool compareTrees(Node* expected, Node* real, const string& path, set<string>& d
     }
 
     // Рекурсивно сравниваем операнды
-    size_t minOperands = min(expected->getOperands().size(), real->getOperands().size());
-    for (size_t i = 0; i < minOperands; ++i) {
+    size_t maxOperands = max(expected->getOperands().size(), real->getOperands().size());
+    for (size_t i = 0; i < maxOperands; ++i) {
         string newPath = path + "/operand[" + to_string(i) + "]";
-        compareTrees(expected->getOperands()[i], real->getOperands()[i], newPath, differences);
+        compareTrees(
+            i < expected->getOperands().size() ? expected->getOperands()[i] : nullptr,
+            i < real->getOperands().size() ? real->getOperands()[i] : nullptr,
+            newPath, differences
+        );
     }
+
+    return differences.empty();
+}
+
+wstring stringToWstring(const string& s) {
+    wstring_convert<codecvt_utf8<wchar_t>> converter;
+    return converter.from_bytes(s);
 }
