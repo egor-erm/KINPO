@@ -11,6 +11,7 @@ namespace TestCompareNodes
 	{
 	public:
 
+		// 1. Целое число стоит до вещественного
 		TEST_METHOD(IntegerBeforeRealNumber)
 		{
 			Assert::AreEqual(
@@ -19,6 +20,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 2. Целое число стоит после вещественного
 		TEST_METHOD(IntegerAfterRealNumber)
 		{
 			Assert::AreEqual(
@@ -27,6 +29,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 3. Целое число стоит до переменной
 		TEST_METHOD(IntegerBeforeVariable)
 		{
 			Assert::AreEqual(
@@ -34,7 +37,8 @@ namespace TestCompareNodes
 				true
 			);
 		}
-
+		
+		// 4. Целое число стоит после переменной
 		TEST_METHOD(IntegerAfterVariable)
 		{
 			Assert::AreEqual(
@@ -43,6 +47,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 5. Целое число стоит до операции
 		TEST_METHOD(IntegerBeforeOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -56,6 +61,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 6. Целое число стоит после операции
 		TEST_METHOD(IntegerAfterOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -69,6 +75,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 7. Вещественное число стоит до переменной
 		TEST_METHOD(RealNumberBeforeVariable)
 		{
 			Assert::AreEqual(
@@ -76,7 +83,8 @@ namespace TestCompareNodes
 				true
 			);
 		}
-
+		
+		// 8. Вещественное число стоит после переменной
 		TEST_METHOD(RealNumberAfterVariable)
 		{
 			Assert::AreEqual(
@@ -85,6 +93,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 9. Вещественное число стоит до операции
 		TEST_METHOD(RealNumberBeforeOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -98,6 +107,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 10. Вещественное число стоит после операции
 		TEST_METHOD(RealNumberAfterOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -111,6 +121,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 11. Переменная стоит до операции
 		TEST_METHOD(VariableBeforeOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -124,6 +135,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 12. Переменная стоит после операции
 		TEST_METHOD(VariableAfterOperation)
 		{
 			Node* node = new Node(NodeType::Plus, vector<Node*>{
@@ -137,6 +149,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 13. Два целых числа
 		TEST_METHOD(TwoIntegers)
 		{
 			Assert::AreEqual(
@@ -145,6 +158,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 14. Два вещественных числа
 		TEST_METHOD(TwoRealNumbers)
 		{
 			Assert::AreEqual(
@@ -153,6 +167,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 15. Две переменные
 		TEST_METHOD(TwoVariables)
 		{
 			Assert::AreEqual(
@@ -161,6 +176,7 @@ namespace TestCompareNodes
 			);
 		}
 
+		// 16. Две операции
 		TEST_METHOD(TwoOperations)
 		{
 			Node* node1 = new Node(NodeType::Plus, vector<Node*>{

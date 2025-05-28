@@ -11,6 +11,7 @@ namespace TestFormatMultiplicationOrder
 	{
 	public:
 
+		// 1. Множители отсортированы
 		TEST_METHOD(MultipliersAreSorted)
 		{
 			Node* expectedNode1 = new Node(NodeType::Integer, "3");
@@ -46,6 +47,7 @@ namespace TestFormatMultiplicationOrder
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 2. Множители в обратном порядке
 		TEST_METHOD(MultipliersInReverseOrder)
 		{
 			Node* expectedNode1 = new Node(NodeType::Integer, "3");
@@ -81,6 +83,7 @@ namespace TestFormatMultiplicationOrder
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 3. Множители в случайном порядке
 		TEST_METHOD(MultipliersInRandomOrder)
 		{
 			Node* expectedNode1 = new Node(NodeType::Integer, "3");
@@ -116,6 +119,7 @@ namespace TestFormatMultiplicationOrder
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 4. Дерево содержит несколько независимых произведений
 		TEST_METHOD(IndependentMultipliers)
 		{
 			

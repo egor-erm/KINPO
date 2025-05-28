@@ -5,6 +5,7 @@
 
 // При использовании предварительно скомпилированных заголовочных файлов необходим следующий файл исходного кода для выполнения сборки.
 
+// Сравнение списков ошибок
 bool compareErrors(const set<Error>& expected, const set<Error>& real, set<Error>& missing, set<Error>& excess) {
     set_difference(expected.begin(), expected.end(),
         real.begin(), real.end(),
@@ -18,6 +19,7 @@ bool compareErrors(const set<Error>& expected, const set<Error>& real, set<Error
     return missing.empty() && excess.empty();
 }
 
+// Сравнение деревьев
 bool compareTrees(Node* expected, Node* real, const string& path, set<string>& differences) {
     // Если один из узлов nullptr, а другой нет - добавляем различие
     if (expected == nullptr || real == nullptr) {

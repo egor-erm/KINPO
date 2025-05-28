@@ -11,6 +11,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 	{
 	public:
 
+		// 1. Недостаточное число операндов
 		TEST_METHOD(MissingOperand)
 		{
 			string tree = "a b ?:";
@@ -49,6 +50,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 2. Неопознанный оператор
 		TEST_METHOD(InvalidExpressionParseTreeElement)
 		{
 			string tree = "a b c +-";
@@ -87,6 +89,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 3. Строка состоит из пробелов
 		TEST_METHOD(EmptyString)
 		{
 			string tree = " ";
@@ -123,6 +126,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 4. Лишний операнд
 		TEST_METHOD(ExtraOperand)
 		{
 			string tree = "a b + c d - e f *";
@@ -167,6 +171,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 5. Дерево разбора выражения с арифметическими операторами
 		TEST_METHOD(ArithmeticOperands)
 		{
 			string tree = "result a 1- b 1+ + c - d * f g / % =";
@@ -194,7 +199,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode13, expectedNode14 });
 
 			set<Error> errors;
-			Node *node = parseExtensionParseTreeToNodeTree(tree, errors);
+			Node* node = parseExtensionParseTreeToNodeTree(tree, errors);
 
 			string path = "/";
 			set<string> differences;
@@ -222,6 +227,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 6. Дерево разбора выражения с операторами сравнения и различными операндами
 		TEST_METHOD(ComparisonOperators)
 		{
 			string tree = "count 5L >= 48 dif <= > 3.6 .5f c != < ==";
@@ -274,6 +280,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 7. Дерево разбора выражения с логическими операторами
 		TEST_METHOD(LogicalOperands)
 		{
 			string tree = "ab_ 1 || bo2 ! &&";
@@ -316,6 +323,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 8. Дерево разбора выражения с составными операторами присваивания
 		TEST_METHOD(CompoundOperators)
 		{
 			string tree = "a b c /= -= d f %= g *= +=";
@@ -364,6 +372,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 9. Дерево разбора выражения с тригонометрическими функциями
 		TEST_METHOD(TrigonometricFunctions)
 		{
 			string tree = "x atan tan acos cos asin sin";
@@ -406,6 +415,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 10. Дерево разбора выражения с математическими функциями
 		TEST_METHOD(MathematicalFunctions)
 		{
 			string tree = "5.3f round floor ceil abs b log10 log2 log exp pow";
@@ -456,6 +466,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 11. Дерево разбора выражения с особыми операторами (тернарный, обращение к элементу массива, приведение типа)
 		TEST_METHOD(SpecialOperators)
 		{
 			string tree = "a b i [] c (type) ?:";
@@ -499,6 +510,7 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 12. Различный формат записи целочисленных операндов
 		TEST_METHOD(IntegerValues)
 		{
 			string tree = "3 3L + 3U 0b11 + 03 0x3 + + +";
@@ -547,9 +559,10 @@ namespace TestParseExtensionParseTreeToNodeTree
 			Assert::IsTrue(isOk, wss.str().c_str());
 		}
 
+		// 13. Различный формат записи вещественных операндов
 		TEST_METHOD(FloatValues)
 		{
-			string tree = "5.3 .3 + 5.2e3 3.2f  + +";
+			string tree = "5.3 .3 + 5.2e3 3.2f + +";
 
 			Node* expectedNode1 = new Node(NodeType::Float, "5.3");
 			Node* expectedNode2 = new Node(NodeType::Float, ".3");

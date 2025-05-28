@@ -139,7 +139,7 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
             || (this->getType() == NodeType::UnaryPlus || this->getType() == NodeType::UnaryMinus) && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
             ) return true;
 
-        if (isFirst && parentIsFirst 
+        if (isFirst
             || (parent->getType() == NodeType::Plus && this->getType() == NodeType::Plus)
             || parent->getType() == NodeType::LogicalAnd 
             || parent->getType() == NodeType::LogicalOr
@@ -333,7 +333,7 @@ const map<NodeType, const string> Node::operatorTypeToTexValue = {
         {NodeType::LessOrEqual, "{} \\leq {}"},
         {NodeType::LogicalAnd, "{} \\wedge {}"},
         {NodeType::LogicalOr, "{} \\vee {}"},
-        {NodeType::Exp, "\\e^{{{}}}"},
+        {NodeType::Exp, "e^{{{}}}"},
         {NodeType::LogicalNot, "\\overline{{{}}}"},
         {NodeType::Abs, "\\abs{{{}}}"},
         {NodeType::Sqrt, "\\sqrt{{{}}}"},
@@ -342,7 +342,7 @@ const map<NodeType, const string> Node::operatorTypeToTexValue = {
         {NodeType::TypeCast, "\\lfloor {} \\rfloor"},
         {NodeType::Round, "\\lfloor {} \\rceil"},
         {NodeType::Pow, "{{{}}}^{{{}}}"},
-        {NodeType::Log, "\\ln{{{}}}{{{}}}"},
+        {NodeType::Log, "\\ln{}{{{}}}"},
         {NodeType::Log2, "\\log_{{2}}{}{{{}}}"},
         {NodeType::Log10, "\\lg{}{{{}}}"},
         {NodeType::Sin, "\\sin{}{{{}}}"},

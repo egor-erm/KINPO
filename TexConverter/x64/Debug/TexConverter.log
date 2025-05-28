@@ -1,4 +1,5 @@
-﻿  Node.cpp
+﻿  Error.cpp
+  Node.cpp
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x8af, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x8b1, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x8b5, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
@@ -40,4 +41,9 @@ D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл с
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x100e, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x1012, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
 D:\university\kinpo\KINPO\TexConverter\Node.cpp(1,1): warning C4828: Файл содержит знак, начинающийся со смещения 0x1015, который является недопустимым в текущей исходной кодировке (кодовая страница 65001).
+  TexConverter.cpp
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(268,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(294,34): warning C4129: .: неизвестная escape-последовательность
+D:\university\kinpo\KINPO\TexConverter\TexConverter.cpp(313,83): warning C4305: аргумент: усечение из "std::ios_base &(__cdecl *)(std::ios_base &)" в "const bool"
+  Создание кода...
   TexConverter.vcxproj -> D:\university\kinpo\KINPO\x64\Debug\TexConverter.exe

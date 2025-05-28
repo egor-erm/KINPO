@@ -11,13 +11,15 @@ namespace TestPrepareExtensionParseTree
 	{
 	public:
 
+		// 1. Раскрытие операции +=
 		TEST_METHOD(DisclosureAddAssign)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
 			Node* expectedNode2 = new Node(NodeType::Variable, "b");
 			Node* expectedNode3 = new Node(NodeType::Plus, vector<Node*>{ expectedNode1, expectedNode2 });
-
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode1, expectedNode3 });
+			
+			Node* expectedNode4 = new Node(NodeType::Variable, "a");
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode4, expectedNode3 });
 
 			Node* node1 = new Node(NodeType::Variable, "a");
 			Node* node2 = new Node(NodeType::Variable, "b");
@@ -39,13 +41,15 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 2. Раскрытие операции -=
 		TEST_METHOD(DisclosureSubtractAssign)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
 			Node* expectedNode2 = new Node(NodeType::Variable, "b");
 			Node* expectedNode3 = new Node(NodeType::Minus, vector<Node*>{ expectedNode1, expectedNode2 });
 
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode1, expectedNode3 });
+			Node* expectedNode4 = new Node(NodeType::Variable, "a");
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode4, expectedNode3 });
 
 			Node* node1 = new Node(NodeType::Variable, "a");
 			Node* node2 = new Node(NodeType::Variable, "b");
@@ -67,13 +71,15 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 3. Раскрытие операции *=
 		TEST_METHOD(DisclosureMultiplyAssign)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
 			Node* expectedNode2 = new Node(NodeType::Variable, "b");
 			Node* expectedNode3 = new Node(NodeType::Multiply, vector<Node*>{ expectedNode1, expectedNode2 });
 
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode1, expectedNode3 });
+			Node* expectedNode4 = new Node(NodeType::Variable, "a");
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode4, expectedNode3 });
 
 			Node* node1 = new Node(NodeType::Variable, "a");
 			Node* node2 = new Node(NodeType::Variable, "b");
@@ -95,13 +101,15 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 4. Раскрытие операции /=
 		TEST_METHOD(DisclosureDivideAssign)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
 			Node* expectedNode2 = new Node(NodeType::Variable, "b");
 			Node* expectedNode3 = new Node(NodeType::Divide, vector<Node*>{ expectedNode1, expectedNode2 });
 
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode1, expectedNode3 });
+			Node* expectedNode4 = new Node(NodeType::Variable, "a");
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode4, expectedNode3 });
 
 			Node* node1 = new Node(NodeType::Variable, "a");
 			Node* node2 = new Node(NodeType::Variable, "b");
@@ -123,13 +131,15 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 5. Раскрытие операции %=
 		TEST_METHOD(DisclosureModAssign)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
 			Node* expectedNode2 = new Node(NodeType::Variable, "b");
 			Node* expectedNode3 = new Node(NodeType::Mod, vector<Node*>{ expectedNode1, expectedNode2 });
 
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode1, expectedNode3 });
+			Node* expectedNode4 = new Node(NodeType::Variable, "a");
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode4, expectedNode3 });
 
 			Node* node1 = new Node(NodeType::Variable, "a");
 			Node* node2 = new Node(NodeType::Variable, "b");
@@ -151,6 +161,7 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 6. Левый оператор является обращением к массиву при раскрытии операции +=
 		TEST_METHOD(ComplexOperand)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
@@ -160,7 +171,11 @@ namespace TestPrepareExtensionParseTree
 			Node* expectedNode4 = new Node(NodeType::Variable, "b");
 			Node* expectedNode5 = new Node(NodeType::Plus, vector<Node*>{ expectedNode3, expectedNode4 });
 
-			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode3, expectedNode5 });
+			Node* expectedNode6 = new Node(NodeType::Variable, "a");
+			Node* expectedNode7 = new Node(NodeType::Variable, "i");
+			Node* expectedNode8 = new Node(NodeType::Indexing, vector<Node*>{ expectedNode6, expectedNode7 });
+
+			Node* expectedNode = new Node(NodeType::Assign, vector<Node*>{ expectedNode8, expectedNode5 });
 
 
 			Node* node1 = new Node(NodeType::Variable, "a");
@@ -186,6 +201,7 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 7. Объединение множителей под одним узлом
 		TEST_METHOD(CombiningMultipliers)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
@@ -222,6 +238,7 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 8. Дерево содержит операторы, препятствующие объединению множителей
 		TEST_METHOD(CombiningMultipliersWithInterruptions)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
@@ -266,6 +283,7 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 9. Объединение множественных обращений к элементу массива под одним узлом
 		TEST_METHOD(CombiningIndexes)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "a");
@@ -303,6 +321,7 @@ namespace TestPrepareExtensionParseTree
 			Assert::IsTrue(differences.empty(), wss.str().c_str());
 		}
 
+		// 10. Дерево содержит обращения к элементу массива и множители
 		TEST_METHOD(MultipliersAndArrayAccesses)
 		{
 			Node* expectedNode1 = new Node(NodeType::Variable, "b");
@@ -330,7 +349,6 @@ namespace TestPrepareExtensionParseTree
 
 			Node* node9 = new Node(NodeType::Indexing, vector<Node*>{ node5, node6 });
 			Node* node10 = new Node(NodeType::Multiply, vector<Node*>{ node7, node8 });
-
 
 			Node* node = new Node(NodeType::Indexing, vector<Node*>{ node9, node10 });
 			prepareExtensionParseTree(node);
