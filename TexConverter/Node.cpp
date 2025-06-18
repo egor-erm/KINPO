@@ -195,7 +195,7 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
             ) return true;
 
         if (isFirst
-            || (parent->getType() == NodeType::Plus && child->getType() == NodeType::Plus)
+            || parent->getType() == NodeType::Plus
             || parent->getType() == NodeType::LogicalAnd 
             || parent->getType() == NodeType::LogicalOr
             ) return false;

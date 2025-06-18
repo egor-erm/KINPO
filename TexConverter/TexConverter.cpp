@@ -381,9 +381,26 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand)
         );
     }
     else if (node->getType() == NodeType::Ternary) {
+        static map<NodeType, NodeType> logicalAntonims = {
+            {NodeType::GreaterThan, NodeType::LessOrEqual},
+            {NodeType::LessThan, NodeType::GreaterOrEqual},
+            {NodeType::EqualTo, NodeType::NotEqualTo},
+            {NodeType::NotEqualTo, NodeType::EqualTo},
+            {NodeType::GreaterOrEqual, NodeType::LessThan},
+            {NodeType::LessOrEqual, NodeType::GreaterThan},
+        };
+
         string condition = convertNodeToTex(operands[0], NULL, true);
-        return "\\begin{cases}" + convertNodeToTex(operands[1], NULL, true) + ", " + condition + " = true\\\\"
-            + convertNodeToTex(operands[2], NULL, true) + ", " + condition + " = false\\end{cases}";
+        if (!logicalAntonims.count(operands[0]->getType())) {
+            return "\\begin{cases}" + convertNodeToTex(operands[1], NULL, true) + ", " + condition + " = true\\\\"
+                + convertNodeToTex(operands[2], NULL, true) + ", " + condition + " = false\\end{cases}";
+        }
+
+        Node oppositeNode = Node(logicalAntonims.at(operands[0]->getType()), operands[0]->getOperands());
+        string oppositeCondition = convertNodeToTex(&oppositeNode, NULL, true);
+
+        return "\\begin{cases}" + convertNodeToTex(operands[1], NULL, true) + ", " + condition + "\\\\"
+            + convertNodeToTex(operands[2], NULL, true) + ", " + oppositeCondition + "\\end{cases}";
     }
     else if (operands.size() == 2) {
         bool firstOpearandInParentheses = operands[0]->needsParentheses(node, isFirstOperand);

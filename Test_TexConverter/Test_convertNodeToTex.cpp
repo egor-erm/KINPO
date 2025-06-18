@@ -286,7 +286,7 @@ namespace TestConvertNodeToTex
 
 			Node* node = new Node(NodeType::Plus, vector<Node*>{ node11, node12 });
 
-			string expectedTex = "{3.5}^{7} - \\sin{5.4} + ({(3.5 \\bullet 10^{3})}^{3} - \\sin{(5.4 \\bullet 10^{3})})";
+			string expectedTex = "{3.5}^{7} - \\sin{5.4} + {(3.5 \\bullet 10^{3})}^{3} - \\sin{(5.4 \\bullet 10^{3})}";
 			string tex = convertNodeToTex(node, NULL, true);
 
 			Assert::AreEqual(expectedTex, tex);
