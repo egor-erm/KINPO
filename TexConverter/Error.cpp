@@ -7,8 +7,9 @@ Error::Error(ErrorType type) {
 }
 
 string Error::generateErrorMessage() const {
-    ostringstream message;
+    ostringstream message; // текст сообщения
 
+    // Для каждого типа ошибки формируем сообщение
     switch (type) {
     case ErrorType::NoAccessToInputFile:
         message << "Неверно указан файл с входными данными. Возможно, файл не существует. Путь: '" << errorInputFileWay << "'";
@@ -19,7 +20,7 @@ string Error::generateErrorMessage() const {
         break;
 
     case ErrorType::InputFileIsEmpty:
-        message << "Входной файл пуст. Файл: '" << errorInputFileWay << "'";
+        message << "Входной файл пуст. " + (!errorInputFileWay.empty() ? "Файл: '" + errorInputFileWay + "'" : "");
         break;
 
     case ErrorType::ExpressionParsingTreeTooLarge:
