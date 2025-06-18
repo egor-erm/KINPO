@@ -272,7 +272,7 @@ namespace TestConvertNodeToTex
 			Node* node1 = new Node(NodeType::Float, "3.5");
 			Node* node2 = new Node(NodeType::Integer, "7");
 			Node* node3 = new Node(NodeType::Float, "5.4");
-			Node* node4 = new Node(NodeType::Float, "3.4e3");
+			Node* node4 = new Node(NodeType::Float, "3.5e3");
 			Node* node5 = new Node(NodeType::Integer, "3");
 			Node* node6 = new Node(NodeType::Float, "5.4e3");
 
@@ -286,7 +286,7 @@ namespace TestConvertNodeToTex
 
 			Node* node = new Node(NodeType::Plus, vector<Node*>{ node11, node12 });
 
-			string expectedTex = "{3.5}^{7} - \\sin{5.4} + ({(3.5 \\bullet 10^{3})}^{7} - \\sin{(5.4 \\bullet 10^{3})})";
+			string expectedTex = "{3.5}^{7} - \\sin{5.4} + ({(3.5 \\bullet 10^{3})}^{3} - \\sin{(5.4 \\bullet 10^{3})})";
 			string tex = convertNodeToTex(node, NULL, true);
 
 			Assert::AreEqual(expectedTex, tex);

@@ -1,3 +1,4 @@
+#include <memory>
 #include "Node.h"
 
 using namespace std;
@@ -76,71 +77,125 @@ int Node::getMultiplierPrecedence() const {
 
 string Node::getTexFormatedValue() const {
     string str;
+    bool has_f;
+    int e_pos;
 
     switch (type) {
     case NodeType::Integer:
+        // Обрабатываем все символы, включая буквы для 16-ричных чисел
         for (char c : value) {
-            if (isalpha(c) && tolower(c) != 'x' && tolower(c) != 'b') break;
+            if (isalpha(c) && tolower(c) != 'x' && tolower(c) != 'b' &&
+                !(str.size() > 1 && str[0] == '0' && tolower(str[1]) == 'x' && isxdigit(c))) {
+                break;
+            }
             str += c;
         }
 
         // Определяем систему счисления
         if (str.size() > 1 && str[0] == '0') {
             if (tolower(str[1]) == 'b' && str.size() > 2) {
+                // Двоичная (0b...)
                 str = str.substr(2) + "_2";
             }
             else if (tolower(str[1]) == 'x' && str.size() > 2) {
-                str = str.substr(2) + "_{16}";
+                // 16-ричная (0x...)
+                string hex_digits = str.substr(2);
+                // Преобразуем буквы в верхний регистр для 16-ричных чисел
+                for (char& c : hex_digits) {
+                    c = toupper(c);
+                }
+                str = hex_digits + "_{16}";
             }
-            else {
+            else if (str.find_first_not_of("01234567") == string::npos) {
+                // Восьмеричная (0...)
                 str = str.substr(1) + "_8";
             }
         }
-
         break;
     case NodeType::Float:
-        // Обрабатываем каждую цифру, удаляя суффикс 'f'
-        for (char c : value) {
+        // Обрабатываем цифры и 'e' для экспоненты, а также 'f' в конце
+        has_f = !value.empty() && tolower(value.back()) == 'f';
+        for (size_t i = 0; i < value.size() - (has_f ? 1 : 0); ++i) {
+            char c = value[i];
             if (isalpha(c) && tolower(c) != 'e') break;
             str += c;
         }
 
-        if (str[0] == '.') {
-            str = "0" + str;
+        // Если было 'f' в конце и нет точки, добавляем .0
+        if (has_f && str.find('.') == string::npos) {
+            str += ".0";
         }
 
+        // Проверяем наличие экспоненциальной записи
+        e_pos = str.find('e');
+        if (e_pos != string::npos) {
+            string mantissa = str.substr(0, e_pos);
+            string exponent = str.substr(e_pos + 1);
+
+            // Добавляем ведущий ноль если нужно
+            if (!mantissa.empty() && mantissa[0] == '.') {
+                mantissa = "0" + mantissa;
+            }
+
+            // Формируем строку в TeX формате
+            str = mantissa + " \\bullet 10^{" + exponent + "}";
+        }
+        else if (!str.empty() && str[0] == '.') {
+            str = "0" + str;
+        }
         break;
-    default:
-        str = value; // Для остальных типов возвращаем как есть
+    case NodeType::Variable:
+        // Экранируем подчёркивания в переменных
+        for (char c : value) {
+            if (c == '_') {
+                str += "\\_";
+            }
+            else {
+                str += c;
+            }
+        }
+        break;
     }
 
     return str;
 }
 
 bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
-    if (this->isOperand() || parent == NULL || parent->isSeparatingOperator()) return false;
+    Node* child = this;
+    unique_ptr<Node> tempChild, tempOperand1, tempOperand2;
+    // Если операнд является числом в экспоненциальной записи
+    if (child->getType() == NodeType::Float && child->getValue().find('e') != string::npos) {
+        // Считать, что вещественный операнд в экспоненциальной записи является умножением
+        tempOperand1.reset(new Node(NodeType::Float, ""));
+        tempOperand2.reset(new Node(NodeType::Integer, ""));
+
+        tempChild.reset(new Node(NodeType::Multiply, vector<Node*>{tempOperand1.get(), tempOperand2.get()}));
+        child = tempChild.get();
+    }
+
+    if (child->isOperand() || parent == NULL || parent->isSeparatingOperator()) return false;
 
     if (parent->isLogOrTrigonometricFunction()) {
-        if (this->getType() == NodeType::Pow && this->getOperands().at(0)->isOperand()) return false;
+        if (child->getType() == NodeType::Pow && child->getOperands().at(0)->isOperand()) return false;
 
-        if (this->getType() == NodeType::Multiply && this->getOperands().size() == 2
-            && (this->getOperands().at(0)->getType() == NodeType::Integer || this->getOperands().at(0)->getType() == NodeType::Float)
-            && this->getOperands().at(1)->getType() == NodeType::Variable) return false;
+        if (child->getType() == NodeType::Multiply && child->getOperands().size() == 2
+            && (child->getOperands().at(0)->getType() == NodeType::Integer || child->getOperands().at(0)->getType() == NodeType::Float)
+            && child->getOperands().at(1)->getType() == NodeType::Variable) return false;
 
-        if (this->getType() == NodeType::Divide) return false;
+        if (child->getType() == NodeType::Divide) return false;
 
         return true;
     }
 
-    bool isFirst = parent->getOperands().front() == this;    
-    if (this->getPrecedence() < parent->getPrecedence()) return true;
-    if (this->getPrecedence() == parent->getPrecedence()) {
-        if ((isFirst && this->getType() == NodeType::Pow && parent->getType() == NodeType::Pow) // todo проверка степеней
-            || (this->getType() == NodeType::UnaryPlus || this->getType() == NodeType::UnaryMinus) && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
+    bool isFirst = parent->getOperands().front() == child;    
+    if (child->getPrecedence() < parent->getPrecedence()) return true;
+    if (child->getPrecedence() == parent->getPrecedence()) {
+        if ((isFirst && child->getType() == NodeType::Pow && parent->getType() == NodeType::Pow)
+            || (child->getType() == NodeType::UnaryPlus || child->getType() == NodeType::UnaryMinus) && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
             ) return true;
 
         if (isFirst
-            || (parent->getType() == NodeType::Plus && this->getType() == NodeType::Plus)
+            || (parent->getType() == NodeType::Plus && child->getType() == NodeType::Plus)
             || parent->getType() == NodeType::LogicalAnd 
             || parent->getType() == NodeType::LogicalOr
             ) return false;
@@ -148,7 +203,7 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
         return true;
     }
 
-    if (this->getType() == NodeType::UnaryMinus || this->getType() == NodeType::UnaryPlus) {
+    if (child->getType() == NodeType::UnaryMinus || child->getType() == NodeType::UnaryPlus) {
         if (isFirst && parentIsFirst) return false;
 
         return true;
