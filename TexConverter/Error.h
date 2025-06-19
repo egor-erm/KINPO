@@ -4,12 +4,12 @@
 
 using namespace std;
 
-//! ѕеречисление типов допустимых ошибок
+//! Перечисление типов допустимых ошибок
 enum class ErrorType {
 	NoAccessToInputFile, ImpossibleToCreateOutputFile, InputFileIsEmpty, ExpressionParsingTreeTooLarge, MultipleInputLines, MissingOperand, ExtraOperand, InvalidExpressionParseTreeElement
 };
 
-//! ќшибка
+//! Ошибка
 class Error {
 private:
 	//! тип ошибки
@@ -24,30 +24,30 @@ private:
 	int errorIndex;
 	
 public:
-	/*!  онструктор ошибки
-	* \param[in] type Ц тип ошибки */
+	/*! Конструктор ошибки
+	* \param[in] type - тип ошибки */
 	Error(ErrorType type);
 
-	/*! √енерирует текст ошибки
-	* return Ц текст ошибки */
+	/*! Генерирует текст ошибки
+	* return - текст ошибки */
 	string generateErrorMessage() const;
 
-	/*! ”станавливает путь до входного файла
-	* \param[in] path Ц путь */
+	/*! Устанавливает путь до входного файла
+	* \param[in] path - путь */
 	void setErrorInputFileWay(string path);
 
-	/*! ”станавливает путь до выходного файла
-	* \param[in] path Ц путь */
+	/*! Устанавливает путь до выходного файла
+	* \param[in] path - путь */
 	void setErrorOutputFileWay(string path);
 
-	/*! ”станавливает недопустимое значение
-	* \param[in] value Ц путь */
+	/*! Устанавливает недопустимое значение
+	* \param[in] value - путь */
 	void setErrorValue(string value);
 
-	/*! ”станавливает индекс недопустимого значени¤
-	* \param[in] index Ц индекс */
+	/*! Устанавливает индекс недопустимого значения
+	* \param[in] index - индекс */
 	void setErrorIndex(int index);
 
-	//! ѕерегрузка оператора <
+	//! Перегрузка оператора <
 	bool operator<(const Error& err) const;
 };

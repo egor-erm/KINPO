@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\university\kinpo\KINPO\x64\Debug\TexConverter.exe</FullPath>
+      <FullPath>D:\university\kinpo\TexConverter\x64\Debug\TexConverter.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

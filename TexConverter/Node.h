@@ -6,12 +6,12 @@
 
 using namespace std;
 
-//! ѕеречисление типов узлов
+//! Перечисление типов узлов
 enum class NodeType {
 	Assign, Plus, Minus, Multiply, Divide, Mod, UnaryPlus, UnaryMinus, GreaterThan, LessThan, EqualTo, NotEqualTo, GreaterOrEqual, LessOrEqual, LogicalAnd, LogicalOr, LogicalNot, AddAssign, SubtractAssign, MultiplyAssign, DivideAssign, ModAssign, Abs, Sqrt, Pow, Ceil, Floor, Round, Exp, Log, Log2, Log10, Sin, Cos, Tan, ArcSin, ArcCos, ArcTan, Indexing, Ternary, TypeCast, Integer, Float, Variable
 };
 
-//! ”зел дерева разбора выражени¤
+//! Узел дерева разбора выражения
 class Node {
 private:
 	//! тип узла
@@ -22,70 +22,70 @@ private:
 	vector<Node*> operands;
 
 public:
-	//! —ловарь перевода значени¤ оператора в тип оператора
+	//! Словарь перевода значения оператора в тип оператора
 	static const map<string, NodeType> operatorToNodeType;
-	//! —ловарь перевода типа оператора в число его операндов
+	//! Словарь перевода типа оператора в число его операндов
 	static const map<NodeType, int> operatorTypeToOperandCount;
-	//! —ловарь перевода типа операнда в его аналог на ¤зыке tex
+	//! Словарь перевода типа операнда в его аналог на языке TeX
 	static const map<NodeType, const string> operatorTypeToTexValue;
 
-    /*!  онструктор узла дл¤ операндов
+    /*! Конструктор узла для операндов
     * \param[in] type - тип узла
     * \param[in] value - значение узла */
     Node(NodeType type, string value);
 
-    /*!  онструктор узла дл¤ операторов
+    /*! Конструктор узла для операторов
      * \param[in] type - тип узла
      * \param[in] operands - вектор операндов */
     Node(NodeType type, vector<Node*> operands);
 
-    /*! ѕровер¤ет, ¤вл¤етс¤ ли узел операндом
-     * \return ¤вл¤етс¤ ли узел операндом */
+    /*! Проверяет, является ли узел операндом
+     * \return является ли узел операндом */
     bool isOperand() const;
 
-    /*! ѕровер¤ет, ¤вл¤етс¤ ли узел оператором
-     * \return ¤вл¤етс¤ ли узел оператором */
+    /*! Проверяет, является ли узел оператором
+     * \return является ли узел оператором */
     bool isOperator() const;
 
-    /*! ѕровер¤ет, ¤вл¤етс¤ ли узел логарифмической или тригонометрической функцией
-     * \return ¤вл¤етс¤ ли узел логарифмической или тригонометрической функцией */
+    /*! Проверяет, является ли узел логарифмической или тригонометрической функцией
+     * \return является ли узел логарифмической или тригонометрической функцией */
     bool isLogOrTrigonometricFunction() const;
 
-    /*! ѕровер¤ет, ¤вл¤етс¤ ли узел разделительным оператором, которому не требуетс¤, чтобы дочерний элемент был в круглых скобках
-     * \return ¤вл¤етс¤ ли узел разделительным оператором */
+    /*! Проверяет, является ли узел разделительным оператором, которому не требуется, чтобы дочерний элемент был в круглых скобках
+     * \return является ли узел разделительным оператором */
     bool isSeparatingOperator() const;
 
-    /*! ѕровер¤ет, нужны ли скобки вокруг текущего узла при преобразовании в TeX
+    /*! Проверяет, нужны ли скобки вокруг текущего узла при преобразовании в TeX
      * \param[in] parent - родительский узел
-     * \param[in] parentIsFirst - флаг, ¤вл¤етс¤ ли родительский узел первым операндом
+     * \param[in] parentIsFirst - флаг, является ли родительский узел первым операндом
      * \return true если скобки нужны */
     bool needsParentheses(Node* parent, const bool parentIsFirst);
 
-    /*! ѕолучает тип узла
+    /*! Получает тип узла
      * \return тип узла */
     NodeType getType() const;
 
-    /*! ”станавливает тип узла
+    /*! Устанавливает тип узла
      * \param[in] type - новый тип узла */
     void setType(NodeType type);
 
-    /*! ¬озвращает приоритет оператора
+    /*! Возвращает приоритет оператора
      * \return приоритет оператора */
     int getPrecedence() const;
 
-    /*! ¬озвращает приоритет дл¤ множителей
-     * \return приоритет умножени¤ */
+    /*! Возвращает приоритет для множителей
+     * \return приоритет умножения */
     int getMultiplierPrecedence() const;
 
-    /*! ѕолучает значение узла в TeX-формате
+    /*! Получает значение узла в TeX-формате
      * \return значение в TeX-формате */
     string getTexFormatedValue() const;
 
-    /*! ѕолучает ссылку на вектор операндов
+    /*! Получает ссылку на вектор операндов
      * \return ссылка на вектор операндов */
     vector<Node*>& getOperands();
 
-    /*! ѕолучает значение узла
+    /*! Получает значение узла
      * \return значение узла */
     string getValue() const;
 };
