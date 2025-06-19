@@ -14,7 +14,7 @@ class Error {
 private:
 	//! тип ошибки
 	ErrorType type;
-	//! путь до некорректного входного файла
+	//! путь до входного файла
 	string errorInputFileWay;
 	//! путь до выходного файла
 	string errorOutputFileWay;
@@ -36,7 +36,7 @@ public:
 	* \param[in] path Ц путь */
 	void setErrorInputFileWay(string path);
 
-	/*! ”станавливает путь до входного файла
+	/*! ”станавливает путь до выходного файла
 	* \param[in] path Ц путь */
 	void setErrorOutputFileWay(string path);
 

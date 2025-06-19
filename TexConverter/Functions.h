@@ -49,22 +49,24 @@ void prepareExtensionParseTree(Node* startNode);
 */
 void formatMultiplicationOrder(Node* startNode);
 
-/*! Сравнивает два узла по приоритетам множителей
-* \param[in] leftNode - указатель на первый узел
-* \param[in] rightNode - указатель на второй узел
-* \return – первый множитель должен стоять раньше второго
-*/
-string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand);
-
-/*! Считывет все поля объекта
+/*! Переводит дерево разбора выражения в формат TeX
 * \param[in] node - указатель на начальный узел
 * \param[in] degreeNode - указатель на узел показателя степени
 * \param[in] isFirstOperand – флаг нахождения операнда в начале выражения
 * \return – строка, содержащая выражение в формате Tex
 */
+string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand);
+
+/*! Сравнивает два узла по приоритетам множителей
+* \param[in] leftNode - указатель на первый узел
+* \param[in] rightNode - указатель на второй узел
+* \return – первый множитель должен стоять раньше второго
+*/
 bool compareNodes(const Node* leftNode, const Node* rightNode);
 
 /*! Оборачивает строку в круглые скобки, если требуется
-* \return – строка, содержащая выражение в формате Tex
+* \param[in] str - строка
+* \param[in] putInParentheses - необходимо ли обернуть строку в круглые скобки
+* \return – строка в круглых скобках при необходимости
 */
 string putInParenthesesIfNeeded(string str, const bool putInParentheses);
