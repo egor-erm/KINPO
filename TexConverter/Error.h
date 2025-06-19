@@ -4,50 +4,50 @@
 
 using namespace std;
 
-//! Перечисление типов допустимых ошибок
+//! С•РµСЂРµС‡РёСЃР»РµРЅРёРµ С‚РёРїРѕРІ РґРѕРїСѓСЃС‚РёРјС‹С… РѕС€РёР±РѕРє
 enum class ErrorType {
 	NoAccessToInputFile, ImpossibleToCreateOutputFile, InputFileIsEmpty, ExpressionParsingTreeTooLarge, MultipleInputLines, MissingOperand, ExtraOperand, InvalidExpressionParseTreeElement
 };
 
-//! Ошибка
+//! СњС€РёР±РєР°
 class Error {
 private:
-	//! тип ошибки
+	//! С‚РёРї РѕС€РёР±РєРё
 	ErrorType type;
-	//! путь до входного файла
+	//! РїСѓС‚СЊ РґРѕ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 	string errorInputFileWay;
-	//! путь до выходного файла
+	//! РїСѓС‚СЊ РґРѕ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
 	string errorOutputFileWay;
-	//! недопустимое значение
+	//! РЅРµРґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
 	string errorValue;
-	//! индекс недопустимого значения
+	//! РёРЅРґРµРєСЃ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ Р·РЅР°С‡РµРЅРёВ¤
 	int errorIndex;
 	
 public:
-	/*! Конструктор ошибки
-	* \param[in] type – тип ошибки */
+	/*! В РѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РѕС€РёР±РєРё
+	* \param[in] type Р¦ С‚РёРї РѕС€РёР±РєРё */
 	Error(ErrorType type);
 
-	/*! Генерирует текст ошибки
-	* return – текст ошибки */
+	/*! в€љРµРЅРµСЂРёСЂСѓРµС‚ С‚РµРєСЃС‚ РѕС€РёР±РєРё
+	* return Р¦ С‚РµРєСЃС‚ РѕС€РёР±РєРё */
 	string generateErrorMessage() const;
 
-	/*! Устанавливает путь до входного файла
-	* \param[in] path – путь */
+	/*! вЂќСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїСѓС‚СЊ РґРѕ РІС…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+	* \param[in] path Р¦ РїСѓС‚СЊ */
 	void setErrorInputFileWay(string path);
 
-	/*! Устанавливает путь до выходного файла
-	* \param[in] path – путь */
+	/*! вЂќСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїСѓС‚СЊ РґРѕ РІС‹С…РѕРґРЅРѕРіРѕ С„Р°Р№Р»Р°
+	* \param[in] path Р¦ РїСѓС‚СЊ */
 	void setErrorOutputFileWay(string path);
 
-	/*! Устанавливает недопустимое значение
-	* \param[in] value – путь */
+	/*! вЂќСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ
+	* \param[in] value Р¦ РїСѓС‚СЊ */
 	void setErrorValue(string value);
 
-	/*! Устанавливает индекс недопустимого значения
-	* \param[in] index – индекс */
+	/*! вЂќСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РёРЅРґРµРєСЃ РЅРµРґРѕРїСѓСЃС‚РёРјРѕРіРѕ Р·РЅР°С‡РµРЅРёВ¤
+	* \param[in] index Р¦ РёРЅРґРµРєСЃ */
 	void setErrorIndex(int index);
 
-	//! Перегрузка оператора <
+	//! С•РµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂР° <
 	bool operator<(const Error& err) const;
 };

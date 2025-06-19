@@ -171,7 +171,7 @@ namespace TestCompareNodes
 		TEST_METHOD(TwoVariables)
 		{
 			Assert::AreEqual(
-				compareNodes(new Node(NodeType::Variable, "sum"), new Node(NodeType::Variable, "order")),
+				compareNodes(new Node(NodeType::Variable, "order"), new Node(NodeType::Variable, "sum")),
 				true
 			);
 		}

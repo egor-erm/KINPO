@@ -20,7 +20,7 @@ string Error::generateErrorMessage() const {
         break;
 
     case ErrorType::InputFileIsEmpty:
-        message << "Входной файл пуст. " + (!errorInputFileWay.empty() ? "Файл: '" + errorInputFileWay + "'" : "");
+        message << "Входной файл пуст.";
         break;
 
     case ErrorType::ExpressionParsingTreeTooLarge:

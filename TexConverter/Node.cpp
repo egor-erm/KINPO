@@ -22,12 +22,12 @@ bool Node::isOperator() const {
 }
 
 bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
-    Node* child = this; // текущий узел
-    unique_ptr<Node> tempChild, tempOperand1, tempOperand2; // динамические указатели на временные узыл
+    Node* child = this; // С‚РµРєСѓС‰РёР№ СѓР·РµР»
+    unique_ptr<Node> tempChild, tempOperand1, tempOperand2; // РґРёРЅР°РјРёС‡РµСЃРєРёРµ СѓРєР°Р·Р°С‚РµР»Рё РЅР° РІСЂРµРјРµРЅРЅС‹Рµ СѓР·С‹Р»
 
-    // Если операнд является числом в экспоненциальной записи
+    // Р•СЃР»Рё РѕРїРµСЂР°РЅРґ СЏРІР»СЏРµС‚СЃСЏ С‡РёСЃР»РѕРј РІ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕР№ Р·Р°РїРёСЃРё
     if (child->getType() == NodeType::Float && child->getValue().find('e') != string::npos) {
-        // Считать, что вещественный операнд в экспоненциальной записи является умножением
+        // РЎС‡РёС‚Р°С‚СЊ, С‡С‚Рѕ РІРµС‰РµСЃС‚РІРµРЅРЅС‹Р№ РѕРїРµСЂР°РЅРґ РІ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕР№ Р·Р°РїРёСЃРё СЏРІР»СЏРµС‚СЃСЏ СѓРјРЅРѕР¶РµРЅРёРµРј
         tempOperand1.reset(new Node(NodeType::Float, ""));
         tempOperand2.reset(new Node(NodeType::Integer, ""));
 
@@ -35,41 +35,41 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
         child = tempChild.get();
     }
 
-    // Вернуть ложь, если текущий узел является операндом, не имеет родителя или не требует скобок
+    // Р’РµСЂРЅСѓС‚СЊ Р»РѕР¶СЊ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» СЏРІР»СЏРµС‚СЃСЏ РѕРїРµСЂР°РЅРґРѕРј, РЅРµ РёРјРµРµС‚ СЂРѕРґРёС‚РµР»СЏ РёР»Рё РЅРµ С‚СЂРµР±СѓРµС‚ СЃРєРѕР±РѕРє
     if (child->isOperand() || parent == NULL || parent->isSeparatingOperator()) return false;
 
-    // Если родитель является логарифмической или тригонометрической функцией
+    // Р•СЃР»Рё СЂРѕРґРёС‚РµР»СЊ СЏРІР»СЏРµС‚СЃСЏ Р»РѕРіР°СЂРёС„РјРёС‡РµСЃРєРѕР№ РёР»Рё С‚СЂРёРіРѕРЅРѕРјРµС‚СЂРёС‡РµСЃРєРѕР№ С„СѓРЅРєС†РёРµР№
     if (parent->isLogOrTrigonometricFunction()) {
-        // Вернуть ложь, если текущий узел является возведением операнда в степень
+        // Р’РµСЂРЅСѓС‚СЊ Р»РѕР¶СЊ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» СЏРІР»СЏРµС‚СЃСЏ РІРѕР·РІРµРґРµРЅРёРµРј РѕРїРµСЂР°РЅРґР° РІ СЃС‚РµРїРµРЅСЊ
         if (child->getType() == NodeType::Pow && child->getOperands().at(0)->isOperand()) return false;
 
-        // Вернуть ложь, если текущий узел является произведением числа на переменную
+        // Р’РµСЂРЅСѓС‚СЊ Р»РѕР¶СЊ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» СЏРІР»СЏРµС‚СЃСЏ РїСЂРѕРёР·РІРµРґРµРЅРёРµРј С‡РёСЃР»Р° РЅР° РїРµСЂРµРјРµРЅРЅСѓСЋ
         if (child->getType() == NodeType::Multiply && child->getOperands().size() == 2
             && (child->getOperands().at(0)->getType() == NodeType::Integer || child->getOperands().at(0)->getType() == NodeType::Float)
             && child->getOperands().at(1)->getType() == NodeType::Variable) return false;
 
-        // Вернуть ложь, если текущий узел является делением
+        // Р’РµСЂРЅСѓС‚СЊ Р»РѕР¶СЊ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» СЏРІР»СЏРµС‚СЃСЏ РґРµР»РµРЅРёРµРј
         if (child->getType() == NodeType::Divide) return false;
 
         return true;
     }
 
-    // Вернуть истину, если текущий узел имеет приоритет, который меньше родительского
+    // Р’РµСЂРЅСѓС‚СЊ РёСЃС‚РёРЅСѓ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» РёРјРµРµС‚ РїСЂРёРѕСЂРёС‚РµС‚, РєРѕС‚РѕСЂС‹Р№ РјРµРЅСЊС€Рµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ
     if (child->getPrecedence() < parent->getPrecedence()) return true;
 
-    bool isFirst = parent->getOperands().front() == child; // флагявляется ли текущий узел первым
+    bool isFirst = parent->getOperands().front() == child; // С„Р»Р°РіСЏРІР»СЏРµС‚СЃСЏ Р»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» РїРµСЂРІС‹Рј
 
-    // Если приоритеты текущего узла и родителя равны
+    // Р•СЃР»Рё РїСЂРёРѕСЂРёС‚РµС‚С‹ С‚РµРєСѓС‰РµРіРѕ СѓР·Р»Р° Рё СЂРѕРґРёС‚РµР»СЏ СЂР°РІРЅС‹
     if (child->getPrecedence() == parent->getPrecedence()) {
-        // Вернуть истину, если возведение в степень снова возводится в степень
+        // Р’РµСЂРЅСѓС‚СЊ РёСЃС‚РёРЅСѓ, РµСЃР»Рё РІРѕР·РІРµРґРµРЅРёРµ РІ СЃС‚РµРїРµРЅСЊ СЃРЅРѕРІР° РІРѕР·РІРѕРґРёС‚СЃСЏ РІ СЃС‚РµРїРµРЅСЊ
         if ((isFirst && child->getType() == NodeType::Pow && parent->getType() == NodeType::Pow)) return true;
 
-        // Вернуть истину, если унарный оператор стоит внутри другого унарного оператора
+        // Р’РµСЂРЅСѓС‚СЊ РёСЃС‚РёРЅСѓ, РµСЃР»Рё СѓРЅР°СЂРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ СЃС‚РѕРёС‚ РІРЅСѓС‚СЂРё РґСЂСѓРіРѕРіРѕ СѓРЅР°СЂРЅРѕРіРѕ РѕРїРµСЂР°С‚РѕСЂР°
         if ((child->getType() == NodeType::UnaryPlus || child->getType() == NodeType::UnaryMinus)
             && (parent->getType() == NodeType::UnaryPlus || parent->getType() == NodeType::UnaryMinus)
             ) return true;
 
-        // Если текущий узел первый ИЛИ имеет тип Plus, LogicalAnd или LogicalOr
+        // Р•СЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» РїРµСЂРІС‹Р№ РР›Р РёРјРµРµС‚ С‚РёРї Plus, LogicalAnd РёР»Рё LogicalOr
         if (isFirst
             || parent->getType() == NodeType::Plus
             || parent->getType() == NodeType::LogicalAnd
@@ -79,9 +79,9 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
         return true;
     }
 
-    // Если текущий узел является унарным минусом или плюсом
+    // Р•СЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» СЏРІР»СЏРµС‚СЃСЏ СѓРЅР°СЂРЅС‹Рј РјРёРЅСѓСЃРѕРј РёР»Рё РїР»СЋСЃРѕРј
     if (child->getType() == NodeType::UnaryMinus || child->getType() == NodeType::UnaryPlus) {
-        // Вернуть истину, если текущий узел и родитель стоят в начале
+        // Р’РµСЂРЅСѓС‚СЊ РёСЃС‚РёРЅСѓ, РµСЃР»Рё С‚РµРєСѓС‰РёР№ СѓР·РµР» Рё СЂРѕРґРёС‚РµР»СЊ СЃС‚РѕСЏС‚ РІ РЅР°С‡Р°Р»Рµ
         if (isFirst && parentIsFirst) return false;
 
         return true;
@@ -91,13 +91,13 @@ bool Node::needsParentheses(Node* parent, const bool parentIsFirst) {
 }
 
 string Node::getTexFormatedValue() const {
-    string str; // итоговая строка
-    bool has_f; // флаг - имеет ли вещественное число литерал f
-    int e_pos; // позиция экспоненты в экспоненциальной записи
+    string str; // РёС‚РѕРіРѕРІР°СЏ СЃС‚СЂРѕРєР°
+    bool has_f; // С„Р»Р°Рі - РёРјРµРµС‚ Р»Рё РІРµС‰РµСЃС‚РІРµРЅРЅРѕРµ С‡РёСЃР»Рѕ Р»РёС‚РµСЂР°Р» f
+    int e_pos; // РїРѕР·РёС†РёСЏ СЌРєСЃРїРѕРЅРµРЅС‚С‹ РІ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕР№ Р·Р°РїРёСЃРё
 
     switch (type) {
     case NodeType::Integer:
-        // Обрабатываем все символы, включая буквы для 16-ричных чисел
+        // РћР±СЂР°Р±Р°С‚С‹РІР°РµРј РІСЃРµ СЃРёРјРІРѕР»С‹, РІРєР»СЋС‡Р°СЏ Р±СѓРєРІС‹ РґР»СЏ 16-СЂРёС‡РЅС‹С… С‡РёСЃРµР»
         for (char c : value) {
             if (isalpha(c) && tolower(c) != 'x' && tolower(c) != 'b' &&
                 !(str.size() > 1 && str[0] == '0' && tolower(str[1]) == 'x' && isxdigit(c))) {
@@ -106,16 +106,16 @@ string Node::getTexFormatedValue() const {
             str += c;
         }
 
-        // Определяем систему счисления
+        // РћРїСЂРµРґРµР»СЏРµРј СЃРёСЃС‚РµРјСѓ СЃС‡РёСЃР»РµРЅРёСЏ
         if (str.size() > 1 && str[0] == '0') {
             if (tolower(str[1]) == 'b' && str.size() > 2) {
-                // Двоичная (0b...)
+                // Р”РІРѕРёС‡РЅР°СЏ (0b...)
                 str = str.substr(2) + "_2";
             }
             else if (tolower(str[1]) == 'x' && str.size() > 2) {
-                // 16-ричная (0x...)
+                // 16-СЂРёС‡РЅР°СЏ (0x...)
                 string hex_digits = str.substr(2);
-                // Преобразуем буквы в верхний регистр для 16-ричных чисел
+                // РџСЂРµРѕР±СЂР°Р·СѓРµРј Р±СѓРєРІС‹ РІ РІРµСЂС…РЅРёР№ СЂРµРіРёСЃС‚СЂ РґР»СЏ 16-СЂРёС‡РЅС‹С… С‡РёСЃРµР»
                 for (char& c : hex_digits) {
                     c = toupper(c);
                 }
@@ -123,13 +123,13 @@ string Node::getTexFormatedValue() const {
                 str = hex_digits + "_{16}";
             }
             else {
-                // Восьмеричная (0...)
+                // Р’РѕСЃСЊРјРµСЂРёС‡РЅР°СЏ (0...)
                 str = str.substr(1) + "_8";
             }
         }
         break;
     case NodeType::Float:
-        // Обрабатываем цифры и 'e' для экспоненты, а также 'f' в конце
+        // РћР±СЂР°Р±Р°С‚С‹РІР°РµРј С†РёС„СЂС‹ Рё 'e' РґР»СЏ СЌРєСЃРїРѕРЅРµРЅС‚С‹, Р° С‚Р°РєР¶Рµ 'f' РІ РєРѕРЅС†Рµ
         has_f = !value.empty() && tolower(value.back()) == 'f';
         for (size_t i = 0; i < value.size() - (has_f ? 1 : 0); ++i) {
             char c = value[i];
@@ -137,23 +137,23 @@ string Node::getTexFormatedValue() const {
             str += c;
         }
 
-        // Если было 'f' в конце и нет точки, добавляем .0
+        // Р•СЃР»Рё Р±С‹Р»Рѕ 'f' РІ РєРѕРЅС†Рµ Рё РЅРµС‚ С‚РѕС‡РєРё, РґРѕР±Р°РІР»СЏРµРј .0
         if (has_f && str.find('.') == string::npos) {
             str += ".0";
         }
 
-        // Проверяем наличие экспоненциальной записи
+        // РџСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ СЌРєСЃРїРѕРЅРµРЅС†РёР°Р»СЊРЅРѕР№ Р·Р°РїРёСЃРё
         e_pos = str.find('e');
         if (e_pos != string::npos) {
             string mantissa = str.substr(0, e_pos);
             string exponent = str.substr(e_pos + 1);
 
-            // Добавляем ведущий ноль, если нужно
+            // Р”РѕР±Р°РІР»СЏРµРј РІРµРґСѓС‰РёР№ РЅРѕР»СЊ, РµСЃР»Рё РЅСѓР¶РЅРѕ
             if (!mantissa.empty() && mantissa[0] == '.') {
                 mantissa = "0" + mantissa;
             }
 
-            // Формируем строку в TeX формате
+            // Р¤РѕСЂРјРёСЂСѓРµРј СЃС‚СЂРѕРєСѓ РІ TeX С„РѕСЂРјР°С‚Рµ
             str = mantissa + " \\bullet 10^{" + exponent + "}";
         }
         else if (!str.empty() && str[0] == '.') {
@@ -161,7 +161,7 @@ string Node::getTexFormatedValue() const {
         }
         break;
     case NodeType::Variable:
-        // Экранируем подчёркивания в переменных
+        // Р­РєСЂР°РЅРёСЂСѓРµРј РїРѕРґС‡С‘СЂРєРёРІР°РЅРёСЏ РІ РїРµСЂРµРјРµРЅРЅС‹С…
         for (char c : value) {
             if (c == '_') {
                 str += "\\_";

@@ -1,4 +1,4 @@
-﻿#define FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -64,6 +64,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    cout << "OK";
     return 0;
 }
 
@@ -93,7 +94,6 @@ string readInputFile(string path, Error* error) {
     if (line.empty()) { // Если строка пустая
         // Возвращаем ошибку, что входной файл пуст
         error = new Error(ErrorType::InputFileIsEmpty);
-        error->setErrorInputFileWay(path);
         return "";
     }
 
@@ -346,7 +346,14 @@ void formatMultiplicationOrder(Node* startNode) {
 }
 
 bool compareNodes(const Node* leftNode, const Node* rightNode) {
-    return leftNode->getMultiplierPrecedence() <= rightNode->getMultiplierPrecedence();
+    if (leftNode->getMultiplierPrecedence() == rightNode->getMultiplierPrecedence()) {
+        if (leftNode->getMultiplierPrecedence() == 3)
+            return leftNode->getType() < rightNode->getType();
+        
+        return leftNode->getValue() < rightNode->getValue();
+    }
+
+    return leftNode->getMultiplierPrecedence() < rightNode->getMultiplierPrecedence();
 }
 
 string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand) {
