@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 string readInputFile(string path, Error*& error) {
     ifstream file(path); // Пытаемся открыть файл
 
-    if (!file.is_open()) { // Если файл не был открыт
+    if (!file.is_open()) { // Если файл открыть не удалось
         // Возвращаем ошибку, что доступа к входному файлу нет
         error = new Error(ErrorType::NoAccessToInputFile);
         error->setErrorInputFileWay(path);

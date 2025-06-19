@@ -1,8 +1,4 @@
-﻿  Error.cpp
-  Node.cpp
-D:\university\kinpo\TexConverter\TexConverter\Node.cpp(146,25): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
-  TexConverter.cpp
-D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(329,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
-D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(370,34): warning C4129: .: неизвестная escape-последовательность
-  Создание кода...
+﻿  TexConverter.cpp
+D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(328,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
+D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(369,34): warning C4129: .: неизвестная escape-последовательность
   TexConverter.vcxproj -> D:\university\kinpo\TexConverter\x64\Debug\TexConverter.exe
