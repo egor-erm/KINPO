@@ -2,8 +2,7 @@
   Node.cpp
 D:\university\kinpo\TexConverter\TexConverter\Node.cpp(146,25): warning C4267: =: преобразование из "size_t" в "int"; возможна потеря данных
   TexConverter.cpp
-D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(326,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
-D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(367,34): warning C4129: .: неизвестная escape-последовательность
+D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(329,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
+D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(370,34): warning C4129: .: неизвестная escape-последовательность
   Создание кода...
-  LINK : не найден или не выполнена сборка D:\university\kinpo\TexConverter\x64\Debug\TexConverter.exe при последней инкрементной компоновке; выполняется полная компоновка
   TexConverter.vcxproj -> D:\university\kinpo\TexConverter\x64\Debug\TexConverter.exe

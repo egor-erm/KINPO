@@ -9,7 +9,7 @@
 * \param[out] error – ошибка чтения файла
 * \return – содержимое файла
 */
-string readInputFile(string path, Error* error);
+string readInputFile(string path, Error*& error);
 
 /*! Записывает текст в файл
 * \param[in] path – путь до выходного файла

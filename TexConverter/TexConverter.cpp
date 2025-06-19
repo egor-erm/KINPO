@@ -15,6 +15,9 @@
 
 int main(int argc, char* argv[])
 {
+    // Устанваливаем кодировку консоли
+    system("chcp 65001>nul");
+
     // Проверка количества аргументов командной строки
     // Программа ожидает 2 аргумента (входной и выходной файлы)
     if (argc != 3) {
@@ -23,12 +26,12 @@ int main(int argc, char* argv[])
     }
 
     // Объявление переменной для хранения возможной ошибки
-    Error* err = NULL;
+    Error* err = nullptr;
 
     // Чтение входного файла (первый аргумент командной строки)
     string tree = readInputFile(argv[1], err);
-    if (err != NULL) { // Если возникла ошибка чтения файла
-        cout << err->generateErrorMessage(); // Вывести сообщение об ошибке
+    if (err != nullptr) { // Если возникла ошибка чтения файла
+        cout << err->generateErrorMessage() << endl; // Вывести сообщение об ошибке
         return 1;
     }
 
@@ -60,7 +63,7 @@ int main(int argc, char* argv[])
     // Запись результата в выходной файл (второй аргумент командной строки)
     err = writeOutputFile(argv[2], tex);
     if (err != NULL) { // Если возникла ошибка записи файла
-        cout << err->generateErrorMessage(); // Вывести сообщение об ошибке
+        cout << err->generateErrorMessage() << endl; // Вывести сообщение об ошибке
         return 1;
     }
 
@@ -68,11 +71,10 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+string readInputFile(string path, Error*& error) {
+    ifstream file(path); // Пытаемся открыть файл
 
-string readInputFile(string path, Error* error) {
-    ifstream file(path); // Пытаемся найти файл
-    
-    if (!file.is_open()) { // Если файл не был найден
+    if (!file.is_open()) { // Если файл не был открыт
         // Возвращаем ошибку, что доступа к входному файлу нет
         error = new Error(ErrorType::NoAccessToInputFile);
         error->setErrorInputFileWay(path);
