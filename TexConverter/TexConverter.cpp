@@ -157,7 +157,7 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
     map<Node*, string> nodesToken; // Соответствие узла и его исходного токена
 
     // Пока получается обнаружить новый токен
-    while (stringStream >> token) {
+    while (stringStream >> token && index <= 1000) {
         NodeType type;  // тип узла
         Node* node;     // создаваемый узел
 
@@ -212,9 +212,15 @@ Node* parseExtensionParseTreeToNodeTree(string extensionParseTree, set<Error>& e
         index++;  // Увеличиваем индекс для следующего токена
     }
 
-    // Возвращаем ошибку
+    // Вернуть ошибку, если дерево не содержит ни одного узла
     if (nodeStack.empty()) {
         errors.insert(Error(ErrorType::InputFileIsEmpty));
+        return nullptr;
+    }
+
+    // Вернуть ошибку, если дерево cодержит более 1000 узлов
+    if (index > 1000) {
+        errors.insert(Error(ErrorType::ExpressionParsingTreeTooLarge));
         return nullptr;
     }
 
@@ -278,7 +284,7 @@ bool isOperand(const string value, NodeType* type) {
 
 void prepareExtensionParseTree(Node* startNode) {
     // Обработка не требуется, если узел является операндом
-    if (startNode->isOperand()) return;
+    if (startNode->isOperand()) return; 
 
     // Словарь соответствия составных операторов присваивания простым операторам
     static map<NodeType, NodeType> operators = {

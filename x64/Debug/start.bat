@@ -1,1 +1,1 @@
-.\TexConverter.exe "D:\university\kinpo\KINPO\x64\Debug\tree.txt" "D:\university\kinpo\KINPO\x64\Debug\out.tex"
+.\TexConverter.exe "tree.txt" "out.tex"
