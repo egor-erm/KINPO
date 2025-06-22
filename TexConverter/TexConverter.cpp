@@ -313,36 +313,9 @@ void prepareExtensionParseTree(Node*& startNode) {
         // Преобразуем текущий узел в простое присваивание
         startNode->setType(NodeType::Assign);
     }
-
-    // Рекурсивная обработка всех операндов текущего узла
-    Node *operand;
-    for (int i = 0; i < startNode->getOperands().size(); i++) {
-        operand = startNode->getOperands().at(i);
-        prepareExtensionParseTree(operand);
-
-        // Оптимизация вложенных операций:
-        // 1. Объединение множителей (a*(b*c) → a*b*c)
-        // 2. Объединение при работе с многомерными массивами (A[i][j] → A[i,j])
-        if ((startNode->getType() == NodeType::Multiply && operand->getType() == NodeType::Multiply)
-            || (i == 0 && startNode->getType() == NodeType::Indexing && operand->getType() == NodeType::Indexing)) {
-            // Удаляем вложенный узел
-            startNode->getOperands().erase(startNode->getOperands().begin() + i);
-
-            // Вставляем его операнды на место удаленного узла
-            startNode->getOperands().insert(startNode->getOperands().begin() + i,
-                operand->getOperands().begin(),
-                operand->getOperands().end());
-
-            // Корректируем индекс цикла с учетом добавленных операндов
-            i += operand->getOperands().size() - 1;
-            // Освобождаем память удаленного узла
-            delete operand;
-        }
-    }
-
-    // Удаление возведений в первую степень(a^1 → a, a^(2 / 1) → a^2)
-    Node* tempNode;
-    if (startNode->getType() == NodeType::Pow) {
+    // Удаление возведений в первую степень(a^1 → a, a^(2/1) → a^2)
+    else if (startNode->getType() == NodeType::Pow) {
+        Node* tempNode;
         // Если степень дробная и её знаменатель является единицей
         if (startNode->getOperands().at(1)->getType() == NodeType::Divide && regex_match(startNode->getOperands().at(1)->getOperands().at(1)->getValue(), one_regex)) {
             // Удаляем знаменатель дроби из памяти
@@ -369,6 +342,32 @@ void prepareExtensionParseTree(Node*& startNode) {
             startNode = tempNode;
         }
     }
+
+    // Рекурсивная обработка всех операндов текущего узла
+    Node* operand;
+    for (int i = 0; i < startNode->getOperands().size(); i++) {
+        prepareExtensionParseTree(startNode->getOperands().at(i));
+        operand = startNode->getOperands().at(i);
+
+        // Оптимизация вложенных операций:
+        // 1. Объединение множителей (a*(b*c) → a*b*c)
+        // 2. Объединение при работе с многомерными массивами (A[i][j] → A[i,j])
+        if ((startNode->getType() == NodeType::Multiply && operand->getType() == NodeType::Multiply)
+            || (i == 0 && startNode->getType() == NodeType::Indexing && operand->getType() == NodeType::Indexing)) {
+            // Удаляем вложенный узел
+            startNode->getOperands().erase(startNode->getOperands().begin() + i);
+
+            // Вставляем его операнды на место удаленного узла
+            startNode->getOperands().insert(startNode->getOperands().begin() + i,
+                operand->getOperands().begin(),
+                operand->getOperands().end());
+
+            // Корректируем индекс цикла с учетом добавленных операндов
+            i += operand->getOperands().size() - 1;
+            // Освобождаем память удаленного узла
+            delete operand;
+        }
+    }
 }
 
 void formatMultiplicationOrder(Node* startNode) {
@@ -387,6 +386,7 @@ void formatMultiplicationOrder(Node* startNode) {
 }
 
 bool compareNodes(const Node* leftNode, const Node* rightNode) {
+    // Если приоритет множителей одинаковый
     if (leftNode->getMultiplierPrecedence() == rightNode->getMultiplierPrecedence()) {
         if (leftNode->getMultiplierPrecedence() == 3)
             return leftNode->getType() < rightNode->getType();
@@ -424,14 +424,15 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand)
         // Обрабатываем остальные операнды
         for (int i = 1; i < operands.size(); i++) {
             rightOperator = operands[i];
-            rightInParentheses = rightOperator->needsParentheses(node, isFirstOperand);
+            rightInParentheses = rightOperator->needsParentheses(node, false);
 
             // Определяем, нужно ли опускать символ умножения
-            bool omitBullet = ((leftOperator->getType() == NodeType::Integer ||
-                leftOperator->getType() == NodeType::Float ||
-                leftOperator->getType() == NodeType::Divide)
-                && (rightOperator->getType() == NodeType::Variable ||
-                    rightOperator->isLogOrTrigonometricFunction()))
+            bool omitBullet = ((leftOperator->getType() == NodeType::Integer || leftOperator->getType() == NodeType::Float || leftOperator->getType() == NodeType::Divide)
+                && (rightOperator->getType() == NodeType::Variable || rightOperator->isLogOrTrigonometricFunction()))
+                || rightOperator->getType() == NodeType::Sqrt
+                || (rightOperator->getType() == NodeType::Pow && rightOperator->getOperands().at(1)->getType() == NodeType::Divide)
+                || leftOperator->getType() == NodeType::Pow
+                || (rightOperator->getType() == NodeType::Pow && rightOperator->getOperands().at(0)->needsParentheses(rightOperator, false))
                 || leftInParentheses || rightInParentheses;
 
             if (!omitBullet) {

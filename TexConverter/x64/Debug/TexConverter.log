@@ -1,5 +1,5 @@
 ﻿  TexConverter.cpp
 D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(17,30): warning C4129: .: неизвестная escape-последовательность
-D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(337,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
+D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(366,48): warning C4267: +=: преобразование из "size_t" в "int"; возможна потеря данных
 D:\university\kinpo\TexConverter\TexConverter\TexConverter.cpp(408,34): warning C4129: .: неизвестная escape-последовательность
   TexConverter.vcxproj -> D:\university\kinpo\TexConverter\x64\Debug\TexConverter.exe
