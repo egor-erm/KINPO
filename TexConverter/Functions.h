@@ -42,7 +42,7 @@ bool isOperand(string value, NodeType* type);
 /*! Преобразует дерево к TeX формату
 * \param[in|out] startNode – указатель на начальный узел дерева
 */
-void prepareExtensionParseTree(Node* startNode);
+void prepareExtensionParseTree(Node*& startNode);
 
 /*! Расставляет множители в нужном порядке
 * \param[in|out] startNode – указатель на начальный узел дерева

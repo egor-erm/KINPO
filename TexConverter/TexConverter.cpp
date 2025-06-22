@@ -13,6 +13,9 @@
 #include "Functions.h"
 #include "Error.h"
 
+// Регулярное выражение для проверки значения "1" в разных форматах
+static const regex one_regex("^1[LlUu]?$|^1\.0[FfLl]?$");
+
 int main(int argc, char* argv[])
 {
     // Устанваливаем кодировку консоли
@@ -282,7 +285,7 @@ bool isOperand(const string value, NodeType* type) {
     return false;
 }
 
-void prepareExtensionParseTree(Node* startNode) {
+void prepareExtensionParseTree(Node*& startNode) {
     // Обработка не требуется, если узел является операндом
     if (startNode->isOperand()) return; 
 
@@ -312,14 +315,14 @@ void prepareExtensionParseTree(Node* startNode) {
     }
 
     // Рекурсивная обработка всех операндов текущего узла
-    Node* operand;
+    Node *operand;
     for (int i = 0; i < startNode->getOperands().size(); i++) {
         operand = startNode->getOperands().at(i);
         prepareExtensionParseTree(operand);
 
         // Оптимизация вложенных операций:
         // 1. Объединение множителей (a*(b*c) → a*b*c)
-        // 2. Обьединение при работе с многомерными массивами (A[i][j] → A[i,j])
+        // 2. Объединение при работе с многомерными массивами (A[i][j] → A[i,j])
         if ((startNode->getType() == NodeType::Multiply && operand->getType() == NodeType::Multiply)
             || (i == 0 && startNode->getType() == NodeType::Indexing && operand->getType() == NodeType::Indexing)) {
             // Удаляем вложенный узел
@@ -334,6 +337,36 @@ void prepareExtensionParseTree(Node* startNode) {
             i += operand->getOperands().size() - 1;
             // Освобождаем память удаленного узла
             delete operand;
+        }
+    }
+
+    // Удаление возведений в первую степень(a^1 → a, a^(2 / 1) → a^2)
+    Node* tempNode;
+    if (startNode->getType() == NodeType::Pow) {
+        // Если степень дробная и её знаменатель является единицей
+        if (startNode->getOperands().at(1)->getType() == NodeType::Divide && regex_match(startNode->getOperands().at(1)->getOperands().at(1)->getValue(), one_regex)) {
+            // Удаляем знаменатель дроби из памяти
+            delete startNode->getOperands().at(1)->getOperands().at(1);
+
+            // Сохраняем числитель и удаляем дробь из памяти
+            tempNode = startNode->getOperands().at(1)->getOperands().at(0);
+            delete startNode->getOperands().at(1);
+
+            // Дробную степень заменяем числителем
+            startNode->getOperands().pop_back();
+            startNode->getOperands().push_back(tempNode);
+        }
+
+        // Если степень является единицей
+        if (regex_match(startNode->getOperands().at(1)->getValue(), one_regex)) {
+            // Сохраняем основание степени
+            tempNode = startNode->getOperands().at(0);
+
+            delete startNode->getOperands().at(1); // Удаляем единичную степень
+            delete startNode; // Удаляем текущий узел (возведение в степень 1)
+
+            // Заменяем возведение в единичную степень основанием степени
+            startNode = tempNode;
         }
     }
 }
@@ -371,8 +404,8 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand)
     // Вектор операндов текущего узла 
     vector<Node*> operands = node->getOperands();
 
-    // Регулярное выражение для проверки значения "1" в разных форматах
-    static const regex one_regex("^1[LlUu]?$|^1\.0[FfLl]?$");
+    // Регулярное выражение для проверки значения "2" в разных форматах
+    static const regex two_regex("^2[LlUu]?$|^2\.0[FfLl]?$");
 
     // Обработка операции умножения
     if (node->getType() == NodeType::Multiply) {
@@ -422,25 +455,42 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand)
             string tex; // строка с результатом
 
             // Если первый операнд является логарифмической или тригонометрической функцией
-            if (operands[0]->isLogOrTrigonometricFunction()) { 
-                tex = convertNodeToTex(operands[0], operands[1]->getOperands().at(0), true);
+            if (operands[0]->isLogOrTrigonometricFunction()) {
+                if (regex_match(operands[1]->getOperands().at(0)->getValue(), one_regex)) {
+                    tex = convertNodeToTex(operands[0], NULL, true);
+                }
+                else {
+                    tex = convertNodeToTex(operands[0], operands[1]->getOperands().at(0), true);
+                }
             }
-            else { // Иначе
-                string operand = putInParenthesesIfNeeded(
-                    convertNodeToTex(operands[0], NULL, true),
-                    operands[0]->needsParentheses(node, isFirstOperand)
-                );
-                string degree = convertNodeToTex(operands[1]->getOperands().at(0), NULL, true);
+            else { 
+                // Опускаем степень, если числитель равен 1
+                if (regex_match(operands[1]->getOperands().at(0)->getValue(), one_regex)) {
+                    tex = convertNodeToTex(operands[0], NULL, true);
+                }
+                else {
+                    // Отображаем значение в степени (числитель дроби)
+                    string operand = putInParenthesesIfNeeded(
+                        convertNodeToTex(operands[0], NULL, true),
+                        operands[0]->needsParentheses(node, isFirstOperand)
+                    );
+                    string degree = convertNodeToTex(operands[1]->getOperands().at(0), NULL, true);
 
-                tex = fmt::vformat(
-                    Node::operatorTypeToTexValue.at(node->getType()),
-                    fmt::make_format_args(operand, degree)
-                );
+                    tex = fmt::vformat(
+                        Node::operatorTypeToTexValue.at(node->getType()),
+                        fmt::make_format_args(operand, degree)
+                    );
+                }
             }
 
-            // Добавляем корень, если знаменатель не является единицей
             if (!regex_match(operands[1]->getOperands().at(1)->getValue(), one_regex)) {
-                tex = "\\sqrt[" + convertNodeToTex(operands[1]->getOperands().at(1), NULL, true) + "]{" + tex + "}";
+                // Определяем, нужно ли писать корень с показателем
+                if (regex_match(operands[1]->getOperands().at(1)->getValue(), two_regex)) {
+                    tex = "\\sqrt{" + tex + "}";
+                }
+                else {
+                    tex = "\\sqrt[" + convertNodeToTex(operands[1]->getOperands().at(1), NULL, true) + "]{" + tex + "}";
+                }
             }
 
             return tex;
@@ -448,6 +498,10 @@ string convertNodeToTex(Node* node, Node* degreeNode, const bool isFirstOperand)
         else { // Обычное возведение в степень
             // Если первый операнд является логарифмической или тригонометрической функцией
             if (operands[0]->isLogOrTrigonometricFunction()) {
+                if (regex_match(operands[1]->getValue(), one_regex)) {
+                    return convertNodeToTex(operands[0], NULL, true);
+                }
+
                 return convertNodeToTex(operands[0], operands[1], true);
             }
             else { // Иначе

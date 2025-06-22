@@ -1,1 +1,0 @@
-.\TexConverter.exe "tree1.txt" "out1.tex"
